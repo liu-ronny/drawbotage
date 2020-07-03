@@ -61,7 +61,7 @@ class Config extends Component {
         >
           <Settings
             selected={this.state.selected === "settings"}
-            roomID={this.props.roomID}
+            roomId={this.props.roomId}
             onLeave={this.props.onLeave}
           />
         </CSSTransition>

@@ -8,11 +8,11 @@ import {
 } from "@testing-library/react";
 import App from "../../../App";
 
-jest.mock("../api/getRoomID", () => {
+jest.mock("../api/getRoomId", () => {
   return jest.fn(() => "41de3945-703e-40b3-b2c3-a31c2071cbc8");
 });
 
-jest.mock("../api/validateRoomID", () => {
+jest.mock("../api/validateRoomId", () => {
   return jest.fn(() => true);
 });
 

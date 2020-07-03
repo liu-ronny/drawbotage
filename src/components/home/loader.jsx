@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Home from "./home";
 import Form from "./form";
 import LoadingScreen from "../loadingScreen";
-import getRoomID from "./api/getRoomID";
+import getRoomId from "./api/getRoomId";
 import { Redirect } from "react-router-dom";
 
 class Loader extends Component {
@@ -11,14 +11,14 @@ class Loader extends Component {
     redirect: false,
     name: null,
     roomName: null,
-    roomID: null,
+    roomId: null,
     create: null,
   };
 
   handleSubmit = async (values, create) => {
     this.setState({ loading: true });
 
-    const roomID = create ? await getRoomID() : values.roomID;
+    const roomId = create ? await getRoomId() : values.roomId;
 
     setTimeout(() => {
       this.setState({
@@ -26,15 +26,15 @@ class Loader extends Component {
         redirect: true,
         name: values.name,
         roomName: values.roomName,
-        roomID: roomID,
+        roomId: roomId,
         create,
       });
     }, 2000);
   };
 
   render() {
-    const roomID = this.props.location.state
-      ? this.props.location.state.roomID
+    const roomId = this.props.location.state
+      ? this.props.location.state.roomId
       : null;
 
     return this.state.loading ? (
@@ -42,7 +42,7 @@ class Loader extends Component {
     ) : this.state.redirect ? (
       <Redirect
         to={{
-          pathname: `/${this.state.roomID}`,
+          pathname: `/${this.state.roomId}`,
           state: {
             ...this.state,
           },
@@ -50,7 +50,7 @@ class Loader extends Component {
       />
     ) : (
       <Home>
-        <Form onSubmit={this.handleSubmit} roomID={roomID} />
+        <Form onSubmit={this.handleSubmit} roomId={roomId} />
       </Home>
     );
   }

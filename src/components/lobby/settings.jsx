@@ -6,7 +6,7 @@ import "./settings.css";
 
 class Settings extends Component {
   state = {
-    url: "http://localhost:3000/" + this.props.roomID,
+    url: "http://localhost:3000/" + this.props.roomId,
     urlCopied: false,
   };
 
@@ -86,7 +86,7 @@ class Settings extends Component {
               {this.props.isHost ? (
                 <Link
                   to={{
-                    pathname: `/${this.props.teamInfo.roomID}`,
+                    pathname: `/${this.props.teamInfo.roomId}`,
                     state: {
                       fromLobby: true,
                       teamInfo: this.props.teamInfo,

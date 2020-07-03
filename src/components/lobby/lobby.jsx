@@ -16,13 +16,11 @@ class Lobby extends Component {
       bluePlayerNames: [],
       redPlayerNames: [],
       unassignedPlayerNames: [],
-      roomID: this.props.location.state.roomID,
+      roomId: this.props.location.state.roomId,
       name: this.props.location.state.name,
       rounds: 3,
       drawTime: 60,
     };
-
-    connection.attach(this);
   }
 
   componentDidMount() {
@@ -33,27 +31,27 @@ class Lobby extends Component {
     for (let i in body) {
       document.body.style[i] = body[i];
     }
+
+    connection.attach(this);
   }
 
-  handleChange = (event, setting) => {
-    const settings = { [setting]: Number(event.target.value) };
-    this.setState(settings);
+  handleChange = (event, settingName) => {
     connection.updateSettings({
-      settings,
-      roomID: this.state.roomID,
+      roomId: this.state.roomId,
+      settingName,
+      settingValue: Number(event.target.value),
     });
   };
 
   handleLeave = () => {
-    connection.leave({
-      roomID: this.state.roomID,
-      isHost: this.state.host === this.state.name,
+    connection.leaveGame({
+      roomId: this.state.roomId,
+      playerName: this.state.name,
     });
   };
 
   updateTeams = (team, index, name, elToDisplay) => {
     const state = this.removePlayer(name);
-    state[team + "PlayerNames"].splice(index, 0, name);
 
     if (elToDisplay) {
       this.setState(state, () => {
@@ -62,26 +60,10 @@ class Lobby extends Component {
     }
 
     connection.updateTeams({
-      playerNames: {
-        blue: state.bluePlayerNames,
-        red: state.redPlayerNames,
-        unassigned: state.unassignedPlayerNames,
-      },
-      roomID: this.state.roomID,
-      name: name,
-      team: team,
-    });
-  };
-
-  removePlayerAndUpdate = (name) => {
-    const state = this.removePlayer(name);
-    connection.removePlayer({
-      roomID: state.roomID,
-      playerNames: {
-        blue: state.bluePlayerNames,
-        red: state.redPlayerNames,
-        unassigned: state.unassignedPlayerNames,
-      },
+      roomId: this.state.roomId,
+      playerName: name,
+      newTeamName: team,
+      insertPosition: index,
     });
   };
 
@@ -110,7 +92,7 @@ class Lobby extends Component {
               <Settings
                 isHost={this.state.host === this.state.name}
                 teamInfo={this.state}
-                roomID={this.props.location.state.roomID}
+                roomId={this.props.location.state.roomId}
                 onLeave={this.handleLeave}
                 onChange={this.handleChange}
                 selected={true}

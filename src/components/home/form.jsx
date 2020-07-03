@@ -64,7 +64,7 @@ class Form extends Component {
           classNames="joinForm"
           selected={this.state.selected === "join"}
         >
-          <JoinForm onSubmit={this.props.onSubmit} roomID={this.props.roomID} />
+          <JoinForm onSubmit={this.props.onSubmit} roomId={this.props.roomId} />
         </CSSTransition>
 
         <CSSTransition

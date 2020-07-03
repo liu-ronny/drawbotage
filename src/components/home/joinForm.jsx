@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputField from "./inputField";
-import validateRoomID from "./api/validateRoomID";
+import validateRoomId from "./api/validateRoomId";
 
 class JoinForm extends Component {
   handleSubmit = (values, { setSubmitting }) => {
@@ -19,15 +19,15 @@ class JoinForm extends Component {
             <Formik
               initialValues={{
                 name: "",
-                roomID: this.props.roomID ? this.props.roomID : "",
+                roomId: this.props.roomId ? this.props.roomId : "",
               }}
               validationSchema={Yup.object({
                 name: Yup.string()
                   .max(50, "Must be 100 characters or less")
                   .required("Required"),
-                roomID: Yup.string()
+                roomId: Yup.string()
                   .required("Required")
-                  .test("room ID is valid", "Invalid room ID", validateRoomID),
+                  .test("room ID is valid", "Invalid room ID", validateRoomId),
               })}
               onSubmit={this.handleSubmit}
             >
@@ -40,7 +40,7 @@ class JoinForm extends Component {
                     placeholder="Your name"
                   />
                   <InputField
-                    name="roomID"
+                    name="roomId"
                     type="text"
                     className="mt-2"
                     spellCheck="false"

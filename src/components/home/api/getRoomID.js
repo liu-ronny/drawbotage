@@ -1,5 +1,5 @@
-export default async function getRoomID() {
+export default async function getRoomId() {
   const response = await fetch("/roomid");
-  const roomID = await response.text();
-  return roomID;
+  const roomId = await response.text();
+  return roomId;
 }

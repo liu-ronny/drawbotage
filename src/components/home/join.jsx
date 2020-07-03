@@ -21,7 +21,7 @@ class Join extends Component {
             </div>
             <JoinForm
               selected={true}
-              roomID={this.props.location.state.roomID}
+              roomId={this.props.location.state.roomId}
             />
           </div>
         </Home>

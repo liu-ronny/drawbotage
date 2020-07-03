@@ -11,15 +11,11 @@ class ProtectedRoute extends Component {
   render() {
     const { component: Component, ...props } = this.props;
     const { pathname = "", state } = props.location;
-    const roomID = pathname.substring(1);
-    const isValidRoomID = this.isUUID(roomID);
+    const roomId = pathname.substring(1);
+    const isValidRoomId = this.isUUID(roomId);
 
-    if (!isValidRoomID) {
-      return (
-        <Route {...props}>
-          <Redirect to="/" />
-        </Route>
-      );
+    if (!isValidRoomId) {
+      return <Redirect to="/" />;
     }
 
     if (state) {
@@ -27,18 +23,22 @@ class ProtectedRoute extends Component {
         return <Route {...props} render={(state) => <Game {...state} />} />;
       }
 
-      return <Route {...props} render={(props) => <Component {...props} />} />;
+      return (
+        <Route
+          path="/:id"
+          {...props}
+          render={(props) => <Component {...props} />}
+        />
+      );
     }
 
     return (
-      <Route {...props}>
-        <Redirect
-          to={{
-            pathname: "/",
-            state: { roomID },
-          }}
-        />
-      </Route>
+      <Redirect
+        to={{
+          pathname: "/",
+          state: { roomId },
+        }}
+      />
     );
   }
 }

@@ -10,7 +10,7 @@ import {
 import { createMemoryHistory } from "history";
 import CreateForm from "../createForm";
 
-jest.mock("../api/getRoomID", () => {
+jest.mock("../api/getRoomId", () => {
   return jest.fn(() => "41de3945-703e-40b3-b2c3-a31c2071cbc8");
 });
 
@@ -75,46 +75,4 @@ describe("create form", () => {
     errorMsg = await findByText("Required");
     expect(errorMsg).toBeTruthy();
   });
-
-  // it("validates correctly on submission", async () => {
-  //   const { history, utils } = renderForm();
-  //   const {
-  //     getByPlaceholderText,
-  //     findByText,
-  //     getByRole,
-  //     findAllByText,
-  //     queryByText,
-  //   } = utils;
-  //   const nameInput = getByPlaceholderText("Your name");
-  //   const roomNameInput = getByPlaceholderText("Room name");
-  //   const createButton = getByRole("button");
-
-  //   fireEvent.submit(createButton);
-  //   const errorMsgs = await findAllByText("Required");
-  //   expect(errorMsgs).toHaveLength(2);
-
-  //   fireEvent.change(nameInput, { target: { value: "a" } });
-  //   fireEvent.submit(createButton);
-  //   let errorMsg = await findByText("Required");
-  //   expect(errorMsg).toBeTruthy();
-
-  //   fireEvent.change(nameInput, { target: { value: "" } });
-  //   fireEvent.change(roomNameInput, { target: { value: "123" } });
-  //   fireEvent.submit(createButton);
-  //   errorMsg = await findByText("Required");
-  //   expect(errorMsg).toBeTruthy();
-
-  //   fireEvent.change(nameInput, { target: { value: "abc" } });
-  //   await waitForElementToBeRemoved(() => queryByText("Required"));
-  //   expect(queryByText("Required")).toBeFalsy();
-
-  //   fireEvent.submit(createButton);
-
-  //   await wait(() => {
-  //     expect(history.location.pathname).toBe("/12345");
-  //     expect(history.location.state.name).toBe("abc");
-  //     expect(history.location.state.roomName).toBe("123");
-  //     expect(history.location.state.create).toBe(true);
-  //   });
-  // });
 });
