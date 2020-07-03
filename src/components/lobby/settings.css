@@ -1,0 +1,41 @@
+.settings-header {
+  font-weight: bold;
+}
+
+.invite-link {
+  background-color: #b3c5c9;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.invite-icon {
+  color: #416fe8;
+}
+
+/* .copied {
+  border: 1px solid #28a745;
+} */
+
+.copied-msg {
+  color: #28a745;
+}
+
+.settings-header {
+  font-size: 2rem;
+  /* padding: 10px;
+  border: 2px solid #48bedb;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px; */
+  text-align: left;
+}
+
+.larger-bold-font {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+}
+
+.game-url {
+  background-color: white !important;
+}

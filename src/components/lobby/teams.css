@@ -1,0 +1,123 @@
+.whiteboard {
+  height: 100%;
+  width: 100%;
+  border: 3px solid #48bedb;
+  border-radius: 5px;
+  box-shadow: inset -4px 4px 6px #d0d3d6;
+  position: relative;
+  font-size: 1.2rem;
+}
+
+.eraser {
+  position: absolute;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  height: 5%;
+  width: 12%;
+}
+
+#eraser1 {
+  bottom: 0;
+  right: 10%;
+  /* background-image: linear-gradient(
+    to top,
+    #b1bdc9 0%,
+    #b1bdc9 25%,
+    #416fe8 26%,
+    #416fe8 100%
+  ); */
+  background-image: linear-gradient(
+    to top,
+    #d0d3d6 0%,
+    #d0d3d6 25%,
+    #44a1f2 26%,
+    #44a1f2 100%
+  );
+}
+
+#eraser2 {
+  bottom: 0;
+  right: 30%;
+  height: 3%;
+  background-image: linear-gradient(
+    to top,
+    #d0d3d6 0%,
+    #d0d3d6 25%,
+    #41e8ad 26%,
+    #41e8ad 100%
+  );
+}
+
+.marker {
+  position: absolute;
+  height: 2%;
+  width: 10%;
+  border-top-left-radius: 50%;
+  /* border-bottom-left-radius: 50%; */
+}
+
+#marker1 {
+  bottom: 0;
+  left: 10%;
+  background-image: linear-gradient(
+    to right,
+    #41e8ad 0%,
+    #44a1f2 80%,
+    #36393d 81%,
+    #36393d 100%
+  );
+}
+
+#marker2 {
+  bottom: 0;
+  left: 30%;
+  /* background-image: linear-gradient(
+    to right,
+    #f2dc74 0%,
+    #f2635c 80%,
+    #36393d 81%,
+    #36393d 100%
+  ); */
+  background-image: linear-gradient(
+    to right,
+    #41e8ad 0%,
+    #44a1f2 80%,
+    #36393d 81%,
+    #36393d 100%
+  );
+}
+
+.teams-header {
+  font-size: 2rem;
+}
+
+.team-boxes {
+  height: 70%;
+}
+
+.overflow-scroll {
+  overflow-y: scroll;
+}
+
+/* .unassigned {
+  border: 1px solid #e0a182 !important;
+  color: #e0a182;
+} */
+
+.player-tag {
+  cursor: pointer;
+  background-color: #e9ecef;
+  border-radius: 5px;
+}
+
+/* .host-player-tag {
+  background-color: beige;
+  border-color: black;
+  border-radius: 5px;
+} */
+
+.host-player-tag::before {
+  font-family: FontAwesome;
+  content: "\f521  ";
+  font-size: inherit;
+}

@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat&display=swap");
+
+#lobby-container {
+  /* font-family: "Open Sans", sans-serif; */
+  font-family: "Caveat", cursive;
+  font-size: 1.2rem !important;
+  padding: 0 10%;
+}
+
+.lobby-active {
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #44a1f2;
+  /* transition: ease-in 1s; */
+}
+
+#lobby {
+  height: 70vh;
+}
+
+#config {
+  border: 3px solid #48bedb;
+  border-radius: 5px;
+}
+
+#teams {
+  margin-right: 0;
+}

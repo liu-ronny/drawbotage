@@ -1,0 +1,23 @@
+.form-button {
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 0.25rem;
+}
+
+.active-form-button {
+  border-bottom: 2px solid;
+}
+
+.form-button:not(.active-form-button):hover .slider {
+  width: 100%;
+}
+
+.slider {
+  position: absolute;
+  display: block;
+  top: 100%;
+  left: 0%;
+  width: 0%;
+  height: 2px;
+  transition: width ease-in 0.5s;
+}

@@ -1,0 +1,17 @@
+@import url("../../../node_modules/dragula/dist/dragula.css");
+
+.bg-team1 {
+  /* background-color: #44a1f2; */
+  background: linear-gradient(to right, #44a1f2, #48bedb);
+}
+
+.bg-team2 {
+  /* background-color: #416fe8; */
+  background: linear-gradient(to right, #3acf9a, #41e8ad);
+}
+
+.bg-unassigned {
+  /* background-color: #abadb0; */
+  /* background-color: #d0d3d6; */
+  background: linear-gradient(to right, #abadb0, #d0d3d6);
+}
