@@ -1,0 +1,9 @@
+.utility-option {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.utility-option-active {
+  background-color: #cacfd2;
+  background-clip: content-box;
+}

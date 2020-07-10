@@ -29,6 +29,18 @@ app.get("/is-valid-roomID/:roomID", (req, res) => {
   res.send(connection.contains(roomId));
 });
 
+app.get("/is-valid-name/:roomID/:playerName", (req, res) => {
+  const roomId = req.params.roomID;
+  const playerName = req.params.playerName;
+
+  if (!connection.contains(roomId)) {
+    res.send(false);
+  }
+
+  const playerNameIsTaken = connection.rooms.get(roomId).contains(playerName);
+  res.send(playerNameIsTaken);
+});
+
 server.listen(8080, () => {
-  console.log("Server listening at http://localhost:8080/");
+  "Server listening at http://localhost:8080";
 });

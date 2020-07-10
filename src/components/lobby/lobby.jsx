@@ -1,8 +1,11 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import Header from "../home/header";
 import Settings from "./settings";
 import Teams from "./teams";
-import connection from "../connection";
+import Game from "../game/game";
+import connection from "../api/connection";
+import redirectOnReload from "../utils/redirectOnUnload";
 import "./lobby.css";
 
 class Lobby extends Component {
@@ -20,6 +23,9 @@ class Lobby extends Component {
       name: this.props.location.state.name,
       rounds: 3,
       drawTime: 60,
+      disconnected: false,
+      disconnectedMsg: "",
+      startGame: false,
     };
   }
 
@@ -32,7 +38,18 @@ class Lobby extends Component {
       document.body.style[i] = body[i];
     }
 
-    connection.attach(this);
+    const redirect = redirectOnReload(window, this.props.history);
+    if (redirect) {
+      return;
+    }
+
+    connection.open();
+    connection.subscribeFromLobby(this);
+  }
+
+  componentWillUnmount() {
+    window.onbeforeunload = null;
+    connection.close();
   }
 
   handleChange = (event, settingName) => {
@@ -40,6 +57,12 @@ class Lobby extends Component {
       roomId: this.state.roomId,
       settingName,
       settingValue: Number(event.target.value),
+    });
+  };
+
+  handleStart = () => {
+    connection.startGame({
+      roomId: this.state.roomId,
     });
   };
 
@@ -83,6 +106,33 @@ class Lobby extends Component {
   };
 
   render() {
+    if (this.state.disconnected) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/error",
+            state: {
+              fromLobby: true,
+              disconnectedMsg: this.state.disconnectedMsg,
+            },
+          }}
+        />
+      );
+    }
+
+    if (this.state.startGame) {
+      return <Game gameInfo={this.state} />;
+
+      // <Redirect
+      //   to={{
+      //     pathname: `/${this.state.roomId}`,
+      //     state: {
+      //       fromLobby: true,
+      //     },
+      //   }}
+      // />
+    }
+
     return (
       <div>
         <div className="container-fluid" id="lobby-container">
@@ -93,8 +143,9 @@ class Lobby extends Component {
                 isHost={this.state.host === this.state.name}
                 teamInfo={this.state}
                 roomId={this.props.location.state.roomId}
-                onLeave={this.handleLeave}
                 onChange={this.handleChange}
+                onStart={this.handleStart}
+                onLeave={this.handleLeave}
                 selected={true}
               />
             </div>

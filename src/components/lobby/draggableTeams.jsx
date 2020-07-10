@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 
 class DraggableTeams extends Component {
-  dragulaDecorator = (componentBackingInstance) => {
-    if (componentBackingInstance && this.props.isHost) {
-      this.props.dragula.containers.push(componentBackingInstance);
-    }
-  };
-
   render() {
+    const dragulaDecorator = (componentBackingInstance) => {
+      if (componentBackingInstance && this.props.isHost) {
+        this.props.dragula.containers.push(componentBackingInstance);
+      }
+    };
+
     return (
       <div
         className="overflow-scroll h-100"
         id={this.props.teamName}
-        ref={this.dragulaDecorator}
+        ref={dragulaDecorator}
       >
         {this.props.playerNames.map((playerName) => {
           const hostClass =

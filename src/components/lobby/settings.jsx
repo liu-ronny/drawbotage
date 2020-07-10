@@ -84,21 +84,14 @@ class Settings extends Component {
             <SettingsBackground />
             <div className="mt-auto">
               {this.props.isHost ? (
-                <Link
-                  to={{
-                    pathname: `/${this.props.teamInfo.roomId}`,
-                    state: {
-                      fromLobby: true,
-                      teamInfo: this.props.teamInfo,
-                    },
-                  }}
+                <button
+                  className="btn btn-outline-primary mr-3 larger-bold-font"
+                  onClick={this.props.onStart}
                 >
-                  <button className="btn btn-outline-primary mr-3 larger-bold-font">
-                    Start game
-                  </button>
-                </Link>
+                  Start game
+                </button>
               ) : null}
-              <Link to="/">
+              <Link to="/" replace={true}>
                 <button
                   className="btn btn-outline-dark-primary larger-bold-font"
                   onClick={this.props.onLeave}

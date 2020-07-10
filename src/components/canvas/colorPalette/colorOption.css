@@ -1,0 +1,24 @@
+.color-option {
+  padding-left: 2px;
+  padding-right: 2px;
+  position: relative;
+}
+
+.color-option-active::after {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  /* text-align: center;
+  font-family: "Font Awesome 5 Free";
+  font-size: 1.5rem;
+  font-weight: 900;
+  content: "\f0d8";
+  color: #a9a9a9; */
+  content: "";
+  background-image: url("../../../images/caret-up-solid.svg");
+  background-position: top;
+  background-repeat: no-repeat;
+}

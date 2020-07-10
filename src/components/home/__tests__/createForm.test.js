@@ -10,7 +10,7 @@ import {
 import { createMemoryHistory } from "history";
 import CreateForm from "../createForm";
 
-jest.mock("../api/getRoomId", () => {
+jest.mock("../../api/getRoomId", () => {
   return jest.fn(() => "41de3945-703e-40b3-b2c3-a31c2071cbc8");
 });
 

@@ -8,16 +8,16 @@ import {
 } from "@testing-library/react";
 import App from "../../../App";
 
-jest.mock("../api/getRoomId", () => {
+jest.mock("../../api/getRoomId", () => {
   return jest.fn(() => "41de3945-703e-40b3-b2c3-a31c2071cbc8");
 });
 
-jest.mock("../api/validateRoomId", () => {
+jest.mock("../../api/validateRoomId", () => {
   return jest.fn(() => true);
 });
 
-jest.mock("../../connection", () => {
-  return { attach: jest.fn() };
+jest.mock("../../api/connection", () => {
+  return { subscribeFromLobby: jest.fn(), unsubscribeFromLobby: jest.fn() };
 });
 
 function renderApp(props) {

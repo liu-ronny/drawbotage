@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputField from "./inputField";
-import validateRoomId from "./api/validateRoomId";
+import validateRoomId from "../api/validateRoomId";
 
 class JoinForm extends Component {
   handleSubmit = (values, { setSubmitting }) => {

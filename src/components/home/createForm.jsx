@@ -23,6 +23,7 @@ class CreateForm extends Component {
               name: Yup.string()
                 .max(100, "Must be 100 characters or less")
                 .required("Required"),
+              // .test("name is valid", "That name is already taken", validatePlayerName()),
               roomName: Yup.string()
                 .max(100, "Must be 100 characters or less")
                 .required("Required"),

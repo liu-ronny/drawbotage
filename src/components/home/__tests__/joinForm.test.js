@@ -9,9 +9,9 @@ import {
 } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import JoinForm from "../joinForm";
-import validateRoomIdMock from "../api/validateRoomId";
+import validateRoomIdMock from "../../api/validateRoomId";
 
-jest.mock("../api/validateRoomId", () => {
+jest.mock("../../api/validateRoomId", () => {
   return jest.fn(() => false);
 });
 

@@ -5,12 +5,6 @@ import JoinForm from "./joinForm";
 import "./join.css";
 
 class Join extends Component {
-  // constructor(props) {
-  //   super(props);
-
-  //   console.log(props.location.pathname);
-  // }
-
   render() {
     if (this.props.location.state) {
       return (
