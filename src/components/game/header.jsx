@@ -4,8 +4,8 @@ import "./header.css";
 class Header extends Component {
   render() {
     return (
-      <div className="game-header d-flex align-items-center">
-        <div className="container-fluid pl-5 py-2">Drawbotage</div>{" "}
+      <div className={this.props.className + " game-header"}>
+        <div className="pl-5 py-2">Drawbotage</div>{" "}
       </div>
     );
   }

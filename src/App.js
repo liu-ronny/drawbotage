@@ -10,14 +10,14 @@ import Game from "./components/game/game";
 class App extends Component {
   render() {
     return (
-      // <Router>
-      //   <Switch>
-      //     <Route path="/" exact component={Loader} />
-      //     <Route path="/error" exact component={ErrorPage} />
-      //     <ProtectedRoute path="/:id" component={Lobby} />
-      //   </Switch>
-      // </Router>
-      <Game />
+      <Router>
+        <Switch>
+          <Route path="/" exact component={Loader} />
+          <Route path="/error" exact component={ErrorPage} />
+          <ProtectedRoute path="/:id" component={Lobby} />
+        </Switch>
+      </Router>
+      // <Game />
     );
   }
 }

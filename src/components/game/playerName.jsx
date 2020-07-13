@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./playerName.css";
+import DynamicText from "./chat/dynamicText";
 
 class PlayerName extends Component {
   render() {
@@ -8,16 +9,14 @@ class PlayerName extends Component {
       : "";
 
     return (
-      <div
+      <DynamicText
         className={
-          "game-player-name pl-2 " +
-          this.props.className +
-          " " +
+          "game-player-name d-flex align-items-center pl-2 " +
           activePlayerClassName
         }
       >
         {this.props.name}
-      </div>
+      </DynamicText>
     );
   }
 }

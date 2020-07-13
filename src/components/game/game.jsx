@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import Teams from "./teams";
 import Header from "./header";
+import Teams from "./teams";
+import Canvas from "../canvas/canvas";
+import Chat from "./chat/chat";
 import connection from "../api/connection";
 import "./game.css";
-import Chat from "./chat";
-import Canvas from "../canvas/canvas";
 
 class Game extends Component {
   state = {
@@ -14,57 +14,60 @@ class Game extends Component {
   componentDidMount() {
     // temporary
     // document.body.style.backgroundColor = "aliceblue";
-    document.body.style.height = "100%";
-    document.documentElement.style.height = "100%";
+    // document.body.style.height = "100%";
+    // document.documentElement.style.height = "100%";
 
+    document.body.style.backgroundColor = "";
     connection.unsubscribeFromLobby();
   }
 
   render() {
-    const redPlayerNames = [
-      "Sandra Mann",
-      "Terrell Thatcher",
-      "Annabelle Jarvis",
-      "Ikrah Hubbard",
-      "Mehmet Vaughn",
-    ];
+    // const redPlayerNames = [
+    //   "Sandra Mann",
+    //   "Terrell Thatcher",
+    //   "Annabelle Jarvis",
+    //   "Ikrah Hubbard",
+    //   "Mehmet Vaughn",
+    // ];
 
-    const bluePlayerNames = [
-      "Gurleen Giles",
-      "Aditya Crawford",
-      "Celine Hobbs",
-      "Jamaal Suarez",
-      "Eva-Rose Wagner",
-    ];
+    // const bluePlayerNames = [
+    //   "Gurleen Giles",
+    //   "Aditya Crawford",
+    //   "Celine Hobbs",
+    //   "Jamaal Suarez",
+    //   "Eva-Rose Wagner",
+    // ];
 
-    const activePlayerName = "Annabelle Jarvis";
-    const style = {
-      height: "100%",
-    };
+    // const activePlayerName = "Annabelle Jarvis";
 
     return (
-      // <div className="d-flex flex-column" style={style}>
-      <>
-        <Header />
-        <div className="container-fluid">
-          <div
-            className="row game-container justify-content-center"
-            style={style}
-          >
-            <div className="col-auto">
-              <Teams
-                redPlayerNames={redPlayerNames}
-                bluePlayerNames={bluePlayerNames}
-                activePlayerName={activePlayerName}
-              />
+      <div className="container-fluid vh-100">
+        <div className="d-flex flex-column h-100">
+          <Header className="row align-items-center" />
+          <div className="row flex-grow-1 align-items-center px-5">
+            <div className="col h-75 px-5">
+              <div className="row game-container justify-content-center h-100">
+                <div className="col-2">
+                  <Teams
+                    redPlayerNames={this.props.gameInfo.redPlayerNames}
+                    bluePlayerNames={this.props.gameInfo.bluePlayerNames}
+                    unassignedPlayerNames={
+                      this.props.gameInfo.unassignedPlayerNames
+                    }
+                    // activePlayerName={this.props.gameInfo.activePlayerName}
+                  />
+                </div>
+                <div className="col-6 col-lg-7">
+                  <Canvas />
+                </div>
+                <div className="col-4 col-lg-3 mh-100">
+                  <Chat />
+                </div>
+              </div>
             </div>
-            <div className="col-6">
-              <Canvas />
-            </div>
-            <div className="col-auto">{/* TODO chat */}</div>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 }

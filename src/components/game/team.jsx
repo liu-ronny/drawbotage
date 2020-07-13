@@ -1,15 +1,17 @@
 import React, { Component } from "react";
-import TeamHeader from "./teamHeader";
+import SectionHeader from "./sectionHeader";
 import PlayerName from "./playerName";
 
 class Team extends Component {
   render() {
+    const className = this.props.className ? this.props.className : "";
+
     return (
-      <div>
-        <TeamHeader
-          teamName={this.props.teamName}
-          color={this.props.color}
+      <div className={className}>
+        <SectionHeader
+          text={this.props.teamName}
           iconClassName={this.props.iconClassName}
+          className={className ? className + "-header" : ""}
         />
         {this.props.playerNames.map((playerName) => (
           <PlayerName
@@ -17,7 +19,6 @@ class Team extends Component {
             name={playerName}
             isActive={playerName === this.props.activePlayerName}
             activePlayerClassName={this.props.activePlayerClassName}
-            className="mb-2"
           />
         ))}
       </div>

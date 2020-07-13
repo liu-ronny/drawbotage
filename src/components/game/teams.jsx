@@ -6,25 +6,29 @@ class Teams extends Component {
   render() {
     return (
       <>
-        <div className="d-flex flex-column game-teams-container p-3">
+        <div className="d-flex flex-column game-teams-container p-3 h-100">
           <Team
+            className="game-team-1"
             teamName="Team1"
-            // color="#44a1f2"
-            color="#5499C7"
             iconClassName="fas fa-pencil-ruler"
             playerNames={this.props.redPlayerNames}
             activePlayerName={this.props.activePlayerName}
             activePlayerClassName="alert-primary"
           />
-          <br />
           <Team
+            className="game-team-2"
             teamName="Team2"
-            // color="#3acf9a"
-            color="#52BE80"
             iconClassName="fas fa-drafting-compass"
             playerNames={this.props.bluePlayerNames}
             activePlayerName={this.props.activePlayerName}
             activePlayerClassName="alert-light-primary"
+          />
+          <Team
+            className="game-spectators"
+            teamName="Spectators"
+            color="#52BE80"
+            iconClassName="fas fa-drafting-compass"
+            playerNames={this.props.unassignedPlayerNames}
           />
         </div>
       </>
