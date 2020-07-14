@@ -3,7 +3,20 @@
   padding-right: 5px;
 }
 
-.utility-option-active {
+.utility-option-active::after {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  content: "";
+  background-image: url("../../../images/caret-up-solid.svg");
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+.size-option-active {
   background-color: #cacfd2;
   background-clip: content-box;
 }

@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+
+.chat {
+  border: 2px solid #d0d3d6;
+  border-radius: 10px;
+}
+
+.chat-header {
+  height: 10%;
+  color: #5d6d7e;
+}
+
+.chat-header-icon {
+  float: left;
+  height: 100%;
+}
+
+.chat-conversation,
+.chat-sender {
+  font-family: "Montserrat", sans-serif;
+}
+
+.chat-conversation {
+  height: 85%;
+  overflow-y: scroll;
+}
+
+.chat-sender {
+  height: 5%;
+  position: relative;
+  cursor: pointer;
+  border-bottom-left-radius: 10px;
+}
+
+.chat-sender-input {
+  height: 100%;
+  width: 90%;
+  border: none;
+  border-bottom-left-radius: 10px;
+}
+
+.chat-sender-input:focus {
+  outline: none;
+}
+
+.chat-sender-button {
+  width: 10%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 95%;
+  transform: translate(-50%, -50%);
+  color: #5d6d7e;
+}

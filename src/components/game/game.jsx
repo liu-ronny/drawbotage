@@ -22,21 +22,23 @@ class Game extends Component {
   }
 
   render() {
-    // const redPlayerNames = [
-    //   "Sandra Mann",
-    //   "Terrell Thatcher",
-    //   "Annabelle Jarvis",
-    //   "Ikrah Hubbard",
-    //   "Mehmet Vaughn",
-    // ];
+    const redPlayerNames = [
+      "Sandra Mann",
+      "Terrell Thatcher",
+      "Annabelle Jarvis",
+      "Ikrah Hubbard",
+      "Mehmet Vaughn",
+    ];
 
-    // const bluePlayerNames = [
-    //   "Gurleen Giles",
-    //   "Aditya Crawford",
-    //   "Celine Hobbs",
-    //   "Jamaal Suarez",
-    //   "Eva-Rose Wagner",
-    // ];
+    const bluePlayerNames = [
+      "Gurleen Giles",
+      "Aditya Crawford",
+      "Celine Hobbs",
+      "Jamaal Suarez",
+      "Eva-Rose Wagner",
+    ];
+
+    const unassignedPlayerNames = ["Hello"];
 
     // const activePlayerName = "Annabelle Jarvis";
 
@@ -49,11 +51,14 @@ class Game extends Component {
               <div className="row game-container justify-content-center h-100">
                 <div className="col-2">
                   <Teams
-                    redPlayerNames={this.props.gameInfo.redPlayerNames}
-                    bluePlayerNames={this.props.gameInfo.bluePlayerNames}
-                    unassignedPlayerNames={
-                      this.props.gameInfo.unassignedPlayerNames
-                    }
+                    // redPlayerNames={this.props.gameInfo.redPlayerNames}
+                    // bluePlayerNames={this.props.gameInfo.bluePlayerNames}
+                    // unassignedPlayerNames={
+                    //   this.props.gameInfo.unassignedPlayerNames
+                    // }
+                    redPlayerNames={redPlayerNames}
+                    bluePlayerNames={bluePlayerNames}
+                    unassignedPlayerNames={unassignedPlayerNames}
                     // activePlayerName={this.props.gameInfo.activePlayerName}
                   />
                 </div>

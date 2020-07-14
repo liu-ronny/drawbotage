@@ -1,8 +1,11 @@
 import Tool from "./tool";
 
+/**
+ * A tool that allows the user to fill the view in the specified PaperScope.
+ */
 class FillTool extends Tool {
   /**
-   * Fills the background with the current stroke color.
+   * Fills the background with the current strokeColor.
    */
   fill() {
     this.canvasManager.clearTool.clear();
@@ -17,6 +20,7 @@ class FillTool extends Tool {
 
     this.canvasManager.eraserTool.rasterizeAfterErase(undefined, false);
     rect.remove();
+    this.paper.view.update();
   }
 }
 

@@ -1,13 +1,13 @@
-import Tool from "./tool";
+import Tool from "../tool";
 
 /**
- * A tool that allows the user to draw in the specified PaperScope.
+ * A tool that draws paths using random colors in the specified PaperScope.
  */
-class DrawingTool extends Tool {
+class ColorTool extends Tool {
   /**
-   * Creates a tool that allows the user to draw in the specified PaperScope.
-   * @param {*} paper - The PaperScope that the tool belongs to
-   * @param {*} canvasManager - The CanvasManager that contains all the tools in the specified PaperScope
+   * Creates a tool that draws paths using random colors in the specified PaperScope.
+   * @param {PaperScope} paper - The PaperScope that the tool belongs to
+   * @param {CanvasManager} canvasManager - The CanvasManager that contains all the tools in the specified PaperScope
    */
   constructor(paper, canvasManager) {
     super(paper, canvasManager);
@@ -19,12 +19,17 @@ class DrawingTool extends Tool {
   }
 
   /**
-   * Creates a new path using the current strokeColor and strokeWidth.
+   * Creates a new path using a random color.
    * @param {ToolEvent} event - The ToolEvent provided by Paper JS
    */
   _draw = (event) => {
     this.path = new this.paper.Path();
-    this._setPathProperties();
+    this.path.strokeColor = {
+      hue: Math.random() * 360,
+      saturation: 0.4,
+      brightness: 0.9,
+    };
+    this.path.strokeWidth = this.canvasManager.strokeWidth;
     this.path.add(event.point);
   };
 
@@ -43,9 +48,9 @@ class DrawingTool extends Tool {
    */
   activate = () => {
     this.tool.activate();
-    this.canvasManager.activeTool = "drawing";
+    this.canvasManager.activeTool = "color";
     this.canvasManager.drawLayer.activate();
   };
 }
 
-export default DrawingTool;
+export default ColorTool;

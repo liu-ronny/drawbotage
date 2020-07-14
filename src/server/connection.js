@@ -11,10 +11,7 @@ class Connection {
 
   attachListeners() {
     this.io.sockets.on("connection", (socket) => {
-      console.log("connecting");
-
       socket.on("createGame", (data) => {
-        console.log("creating...");
         if (this.rooms.has(data.roomId)) {
           // this.emitError(
           //   socket,
@@ -24,7 +21,7 @@ class Connection {
           return;
         }
 
-        const room = new Room(data.roomId, data.rounds, data.drawTime);
+        const room = new Room(this, data.roomId, data.rounds, data.drawTime);
         room.add(data.playerName, socket);
         room.setHost(data.playerName, socket);
         this.rooms.set(data.roomId, room);
@@ -110,19 +107,13 @@ class Connection {
 
         if (room.size() === 0) {
           this.rooms.delete(socket.roomId);
-
-          console.log("rooms: ", this.rooms);
           return;
         }
 
         this.emitInfo(data.roomId);
-
-        console.log("rooms: ", this.rooms);
       });
 
       socket.on("disconnect", () => {
-        console.log("a user has disconnected");
-
         if (!this.rooms.has(socket.roomId)) {
           return;
         }
@@ -133,14 +124,10 @@ class Connection {
 
         if (room.size() === 0) {
           this.rooms.delete(socket.roomId);
-
-          console.log("rooms: ", this.rooms);
           return;
         }
 
         this.emitInfo(socket.roomId);
-
-        console.log("rooms: ", this.rooms);
       });
     });
   }

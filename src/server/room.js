@@ -1,5 +1,6 @@
 class Room {
-  constructor(roomId, rounds, drawTime) {
+  constructor(connection, roomId, rounds, drawTime) {
+    this.connection = connection;
     this.roomId = roomId;
     this.redPlayerNames = [];
     this.bluePlayerNames = [];

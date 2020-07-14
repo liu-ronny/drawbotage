@@ -1,14 +1,28 @@
 import Tool from "./tool";
 
+/**
+ * A tool that allows the user to erase in the specified PaperScope.
+ */
 class EraserTool extends Tool {
-  constructor(paper, canvasComponent, canvasManager) {
-    super(paper, canvasComponent, canvasManager);
+  /**
+   * Creates a tool that allows the user to erase in the specified PaperScope.
+   * @param {*} paper - The PaperScope that the tool belongs to
+   * @param {*} canvasManager - The CanvasManager that contains all the tools in the specified PaperScope
+   * @property {number} symbolCount - The current number of eraser symbols in the erase layer
+   * @property {number} maxSymbolCount - The max number of eraser symbols that can be placed in erase layer before it is rasterized
+   * @property {SymbolItem} currentOutline - The last placed instance of the relevant eraser outline SymbolDefinition
+   * @property {object} symbols - An object that contains an outline and eraser SymbolDefinition for each eraser size
+   * @property {SymbolDefinition} eraserOutlineSymbol - The outline definition for the currently selected eraser size
+   * @property {SymbolDefinition} eraserSymbol - The definition for the currently selected eraser size
+   */
+  constructor(paper, canvasManager, eraserSizes) {
+    super(paper, canvasManager);
 
     this.symbolCount = 0;
     this.maxSymbolCount = 200;
     this.currentOutline = null;
 
-    this.symbols = this._createEraserSymbols(canvasManager.eraserSizes);
+    this.symbols = this._createEraserSymbols(eraserSizes);
     this.eraserOutlineSymbol = this.symbols.smallEraserSizeOutlineSymbol;
     this.eraserSymbol = this.symbols.smallEraserSizeSymbol;
 
@@ -19,6 +33,11 @@ class EraserTool extends Tool {
     this.tool.onMouseUp = this.rasterizeAfterErase;
   }
 
+  /**
+   * Creates an outline and eraser SymbolDefinition for each provided size.
+   * @param {{smallEraserSize: [width, length], mediumEraserSize: [width, length], largeEraserSize: [width, length]}} sizes - The sizes of the erasers to create
+   * @returns An object containing the created symbols
+   */
   _createEraserSymbols = (sizes) => {
     const symbols = {};
 
@@ -35,6 +54,7 @@ class EraserTool extends Tool {
         strokeColor: "#FFFFFF",
         fillColor: "#FFFFFF",
       });
+
       symbols[sizeName + "OutlineSymbol"] = new this.paper.SymbolDefinition(
         eraserOutlinePath
       );
@@ -46,15 +66,18 @@ class EraserTool extends Tool {
     return symbols;
   };
 
+  /**
+   * Sets the selected eraser size
+   * @param {string} size - The size to set for the eraser. One of "small", "medium", or "large".
+   */
   setEraserSize = (size) => {
     this.eraserOutlineSymbol = this.symbols[size + "EraserSizeOutlineSymbol"];
     this.eraserSymbol = this.symbols[size + "EraserSizeSymbol"];
   };
 
   /**
-   * Places the current eraserSymbol at the event point. This has the effect of "erasing" the part of the canvas covered by the symbol.
-   * Because erasing adds additional items to the active layer, we optimize for performance by rasterizing after each erase to maintain a consistent FPS.
-   * @param {ToolEvent} event
+   * Places an instance of the current eraser symbol at the event point. This has the effect of "erasing" the part of the canvas covered by the symbol.
+   * @param {ToolEvent} event - The ToolEvent provided by Paper JS
    */
   _erase = (event) => {
     this._removeOutline();
@@ -66,13 +89,10 @@ class EraserTool extends Tool {
       this.rasterizeAfterErase(event);
       this.symbolCount = 0;
     }
-
-    // console.log(this.canvasManager.drawLayer.children);
-    // console.log(this.canvasManager.eraseLayer.children);
   };
 
   /**
-   * Removes the current outline from the active layer.
+   * Removes the current outline.
    */
   _removeOutline = () => {
     if (this.currentOutline) {
@@ -82,8 +102,8 @@ class EraserTool extends Tool {
   };
 
   /**
-   * Places an instance of the current eraser outline symbol at the provided point in the view.
-   * @param {Point} point - a Paper JS point
+   * Places an instance of the current eraser outline symbol at the point in the provided event.
+   * @param {ToolEvent} event - The ToolEvent provided by Paper JS
    */
   _placeOutline = (event) => {
     const instance = this.eraserOutlineSymbol.place(event.point);
@@ -91,8 +111,8 @@ class EraserTool extends Tool {
   };
 
   /**
-   * Displays the eraser to the screen.
-   * @param {ToolEvent} event
+   * Displays the eraser on the underlying canvas.
+   * @param {ToolEvent} event - The ToolEvent provided by Paper JS
    */
   _displayEraser = (event) => {
     this._removeOutline();
@@ -100,9 +120,10 @@ class EraserTool extends Tool {
   };
 
   /**
-   * Converts the active layer's paths into an image. This is an extension of rasterize() used to rasterize a newly erased activeLayer.
-   * It removes the existing outline symbol and clears all stored eraser paths in memory.
-   * @param {ToolEvent} event
+   * Converts the erase layer's paths into an image, which is then inserted into the draw layer.
+   * The existing paths in the erase layer are cleared afterward.
+   * @param {ToolEvent} event - The ToolEvent provided by Paper JS
+   * @param {boolean} displayAfter - Whether to display the eraser outline after rasterization
    */
   rasterizeAfterErase = (event, displayAfter = true) => {
     const drawLayer = this.canvasManager.drawLayer;
@@ -119,8 +140,14 @@ class EraserTool extends Tool {
     }
   };
 
+  /**
+   * Activates the corresponding Tool in the current PaperScope. Ensures that
+   * new paths are added to the erase layer.
+   * @override
+   */
   activate = () => {
     this.tool.activate();
+    this.canvasManager.activeTool = "eraser";
     this.canvasManager.eraseLayer.activate();
   };
 }

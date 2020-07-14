@@ -44,17 +44,8 @@ class Canvas extends Component {
 
   componentDidMount() {
     // window.addEventListener("load", this.handleLoad);
-    this.handleLoad();
-  }
-
-  componentWillUnmount() {
-    // window.removeEventListener("load", this.handleLoad);
-    window.removeEventListener("resize", this.resize);
-  }
-
-  handleLoad = () => {
     paper.setup(this.paperRef.current);
-    this.canvasManager = new CanvasManager(paper, this, {
+    this.canvasManager = new CanvasManager(paper, {
       strokeColor: this.defaultStrokeColor,
       strokeWidth: this.smallStrokeWidth,
       eraserSizes: {
@@ -65,7 +56,13 @@ class Canvas extends Component {
     });
     this.resizeCanvas();
     window.addEventListener("resize", this.resizeCanvas);
-  };
+    this.setState({ activeTool: this.canvasManager.activeTool });
+  }
+
+  componentWillUnmount() {
+    // window.removeEventListener("load", this.handleLoad);
+    window.removeEventListener("resize", this.resizeCanvas);
+  }
 
   /**
    * Resizes the canvas to fit its container and resizes the project view to fit the canvas.
@@ -99,8 +96,8 @@ class Canvas extends Component {
             strokeColors={this.strokeColors}
             activeStrokeColor={this.state.strokeColor}
             activeSizeSelection={this.state.sizeSelection}
+            activeTool={this.state.activeTool}
             onColorOptionClick={(strokeColor) => {
-              this.canvasManager.drawingTool.activate();
               this.canvasManager.strokeColor = strokeColor;
               this.setState({ strokeColor });
             }}
@@ -119,9 +116,38 @@ class Canvas extends Component {
               this.canvasManager.eraserSize = "large";
               this.setState({ sizeSelection: "large" });
             }}
-            onEraserClick={() => this.canvasManager.eraserTool.activate()}
-            onClearClick={() => this.canvasManager.clearTool.clear()}
-            onFillClick={() => this.canvasManager.fillTool.fill()}
+            onDrawClick={() => {
+              this.canvasManager.drawingTool.activate();
+              this.setState({ activeTool: this.canvasManager.activeTool });
+            }}
+            onEraserClick={() => {
+              this.canvasManager.eraserTool.activate();
+              this.setState({ activeTool: this.canvasManager.activeTool });
+            }}
+            onClearClick={() => {
+              this.canvasManager.clearTool.clear();
+              this.setState({ activeTool: this.canvasManager.activeTool });
+            }}
+            onFillClick={() => {
+              this.canvasManager.fillTool.fill();
+              this.setState({ activeTool: this.canvasManager.activeTool });
+            }}
+            // onReverseClick={() => {
+            //   this.canvasManager.drawbotages.reverseTool.activate();
+            //   this.setState({ activeTool: this.canvasManager.activeTool });
+            // }}
+            // onHideClick={() => {
+            //   this.canvasManager.drawbotages.hideTool.activate();
+            //   this.setState({ activeTool: this.canvasManager.activeTool });
+            // }}
+            onColorClick={() => {
+              this.canvasManager.drawbotages.colorTool.activate();
+              this.setState({ activeTool: this.canvasManager.activeTool });
+            }}
+            onBulldozeClick={() => {
+              this.canvasManager.drawbotages.bulldozeTool.activate();
+              this.setState({ activeTool: this.canvasManager.activeTool });
+            }}
           />
         </div>
       </div>

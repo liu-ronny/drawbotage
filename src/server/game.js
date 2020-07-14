@@ -1,67 +1,39 @@
+const PlayerList = require("./playerList");
+
 class Game {
-  constructor(io, roomID, rounds, drawTime) {
-    this.io = io;
+  constructor(connection, room, roomID, rounds, drawTime) {
+    this.connection = connection;
+    this.room = room;
     this.roomID = roomID;
     this.rounds = rounds;
     this.drawTime = drawTime;
 
     this.redScore = 0;
     this.blueScore = 0;
-    this.currentPlayer = null;
-    this.currentTeam = null;
+    this.activePlayerName = null;
+    this.activeTeamName = null;
     this.round = 1;
     this.turn = 1;
 
-    const {
-      red: redPlayerCount,
-      blue: bluePlayerCount,
-    } = this.getPlayerCounts();
-    this.turnsPerRound = Math.max(redPlayerCount, bluePlayerCount);
+    const roomInfo = room.info();
+    this.redPlayerNames = new PlayerList(room, roomInfo.redPlayerNames);
+    this.bluePlayerNames = new PlayerList(room, roomInfo.bluePlayerNames);
+    this.turnsPerRound = Math.max(
+      roomInfo.redPlayerNames.length,
+      roomInfo.bluePlayerNames.length
+    );
   }
 
-  getPlayerCounts() {
-    const io = this.io;
-    const roomID = this.roomID;
-    const playerCounts = { red: 0, blue: 0 };
+  start() {
+    this.activeTeamName = Math.random() < 0.5 ? "blue" : "red";
 
-    const clients = io.sockets.adapter.rooms[roomID].sockets;
-    for (let clientID in clients) {
-      const clientSocket = io.sockets.connected[clientID];
-      playerCounts[clientSocket.drawbotageTeam] += 1;
-    }
-
-    return playerCounts;
-  }
-
-  getNextPlayer() {
-    const red = this.red;
-    const blue = this.blue;
-    const currentTeam = this.currentTeam;
-    const currentPlayer = currentTeam.getCurrentPlayer();
-    const wordBank = this.wordBank;
-    const TURNS_PER_ROUND = this.TURNS_PER_ROUND;
-    const ROUNDS = this.ROUNDS;
-
-    if (currentTeam === red) {
-      this.currentTeam = blue;
-    } else {
-      this.currentTeam === red;
-    }
-
-    if (typeof currentPlayer === undefined) {
-      this.tooManyDisconnections = true;
-    }
-
-    this.currentWord = wordBank.getWord();
-
-    this.turn += 1;
-    if (this.turn === TURNS_PER_ROUND) {
-      this.round += 1;
-      this.turn = 1;
-    }
-
-    if (this.round > ROUNDS) {
-      this.isActive = false;
+    try {
+      this.activePlayerName = this[this.activeTeamName + "playerNames"].next();
+    } catch (EmptyPlayerListError) {
+      // TODO - implement the game error logic
+      //   this.connection.emitGameError("A team did not have enough players.");
     }
   }
+
+  play() {}
 }

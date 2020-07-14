@@ -6,7 +6,7 @@ let playerName;
 let playerSocket;
 
 beforeEach(() => {
-  room = new Room("41de3945-703e-40b3-b2c3-a31c2071cbc8", 3, 60);
+  room = new Room(null, "41de3945-703e-40b3-b2c3-a31c2071cbc8", 3, 60);
   unassignedPlayerNames = [];
   playerName = "p0";
   playerSocket = {
