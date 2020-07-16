@@ -1,7 +1,7 @@
 const app = require("express")(),
   { v4: uuid } = require("uuid"),
   server = require("http").Server(app),
-  Connection = require("./connection");
+  Connection = require("./connection/connection");
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from

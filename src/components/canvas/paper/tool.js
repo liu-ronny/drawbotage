@@ -4,7 +4,7 @@
  */
 class Tool {
   /**
-   * Creates a Paper JS Tool object in the specified PaperScope.
+   * Creates a wrapper around the Paper JS Tool object in the specified PaperScope.
    * @param {PaperScope} paper - The PaperScope that the tool belongs to
    * @param {CanvasManager} canvasManager - The CanvasManager that contains all the tools in the specified PaperScope
    * @property {PaperScope} paper - The PaperScope that the tool belongs to

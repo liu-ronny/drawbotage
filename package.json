@@ -46,6 +46,7 @@
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
+    "csv-parse": "^4.10.1",
     "socket.io-mock": "^1.2.4"
   }
 }

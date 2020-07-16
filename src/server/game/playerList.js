@@ -1,3 +1,7 @@
+/**
+ * An error that is thrown when a PlayerList is logically "empty" when its next()
+ * method is called. An empty list contains < 2 elements.
+ */
 class EmptyPlayerListError extends Error {
   constructor(...args) {
     super(...args);
@@ -29,7 +33,7 @@ class PlayerList {
 
   /**
    * Returns the name of the next available player. If the next player is no longer in the room,
-   * the player's name is discarded from the list.
+   * the player's name is discarded from the list and the search continues.
    * @throws {EmptyPlayerListError} An error indicating that the PlayerList has less than 2 players
    * @returns {string} The name of the next available player
    */
@@ -57,6 +61,17 @@ class PlayerList {
 
     this._temp.push(top);
     return top;
+  }
+
+  /**
+   * Returns the name of the next available player without moving forward in the list.
+   */
+  peek() {
+    // get the next available player and move it back to the main stack
+    const next = this.next();
+    this._names.push(next);
+    this._temp.pop();
+    return next;
   }
 }
 
