@@ -192,24 +192,25 @@ class Room {
     return this.players.size;
   }
 
-  /**
-   * Starts a Drawbotage game using the players in the room.
-   */
-  async startGame() {
-    this.gameStarted = true;
-    const game = new Game(
+  createGame() {
+    this.game = new Game(
       this.connection,
       this,
       this.roomId,
       this.rounds,
       this.drawTime
     );
+  }
 
+  /**
+   * Starts a Drawbotage game using the players in the room.
+   */
+  async startGame() {
+    this.gameStarted = true;
     try {
-      await game.play();
+      await this.game.play();
     } catch (err) {
-      // console.log(err);
-      throw err;
+      console.log(err);
     }
 
     // this.connection.remove(this.roomId);

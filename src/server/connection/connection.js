@@ -16,6 +16,7 @@ class Connection {
     this.io = io(server);
     this.io.set("origins", "http://localhost:3000/");
     this.rooms = new Map();
+    this.checkGuess = null;
     this.init();
   }
 
@@ -100,6 +101,7 @@ class Connection {
 
         const room = this.rooms.get(data.roomId);
         this.io.to(data.roomId).emit("startGame", room.info());
+        room.createGame();
         room.startGame();
       });
 
@@ -138,6 +140,12 @@ class Connection {
 
         this.emitInfo(socket.roomId);
       });
+
+      socket.on("guess", (data) => {
+        if (this.checkGuess) {
+          this.checkGuess(data);
+        }
+      });
     });
   }
 
@@ -158,7 +166,7 @@ class Connection {
    * @param {string} roomId - The UUID that identifies the room
    */
   remove(roomId) {
-    this.rooms.remove(roomId);
+    this.rooms.delete(roomId);
   }
 
   /**
@@ -167,6 +175,10 @@ class Connection {
    */
   contains(roomId) {
     return this.rooms.has(roomId);
+  }
+
+  get(roomId) {
+    return this.rooms.get(roomId);
   }
 
   /**
@@ -185,31 +197,6 @@ class Connection {
    */
   emitError(recipient, message) {
     this.emit("error", recipient, { message });
-  }
-
-  /**
-   * Emits a timer event to either a specific client socket or to all clients in the room.
-   * @param {string} event - The name of the timer event (e.g. turnTimer, choiceTimer)
-   * @param {object|string} recipient - Either a client socket object or a room id
-   * @param {number} time - The number of milliseconds in the timer. Must be >= 1000
-   * @returns {number} The id of the interval that emits the timer events. Calling clearInterval on it will stop the timer.
-   */
-  emitTimer(event, recipient, time) {
-    let timeRemaining = time;
-
-    const id = setInterval(() => {
-      // stop emitting the timer when there is no more time remaining
-      if (timeRemaining <= 0) {
-        clearInterval(id);
-        return;
-      }
-
-      // emit a timer event every second so the client(s) knows how much time there is left to respond
-      this.emit(event, recipient, { timeRemaining });
-      timeRemaining -= 1000;
-    }, 1000);
-
-    return id;
   }
 
   /**
@@ -241,9 +228,27 @@ class Connection {
   }
 
   /**
-   *
+   * Opens up guesses and allows the connection to respond to incoming guess events.
+   * @param {function} check - The validator function used to check guesses
+   * @param {function} callback - The function to run if a correct guess has been identified
    */
-  receiveGuesses() {}
+  enableGuesses(check, callback) {
+    this.checkGuess = (data) => {
+      const { guess, playerName, fromTeam, timeRemaining } = data;
+
+      const isCorrect = check(guess, fromTeam);
+      if (isCorrect) {
+        callback(playerName, timeRemaining);
+      }
+    };
+  }
+
+  /**
+   * Closes up guesses so that guess events don't do anything.
+   */
+  disableGuesses() {
+    this.checkGuess = null;
+  }
 }
 
 module.exports = Connection;

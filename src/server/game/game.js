@@ -1,6 +1,22 @@
 const PlayerList = require("./playerList");
 const WordBank = require("./wordBank");
-const { timeoutPromise, intervalPromise } = require("../utils/promises");
+const { intervalPromise } = require("../utils/promises");
+
+/**
+ * @typedef {object} TurnResult
+ * @param {number} timeRemaining - The number of milliseconds remaining on the timer when the turn ended
+ * @param {string} [playerName] - The name of the player who correctly guessed the word
+ */
+
+/**
+ * @typedef {object} GameInfo
+ * @param {string} word - The selected word for the turn
+ * @param {number} points - The number of points the current team gained during the turn
+ * @param {number} prevScore - The previous score of the current team
+ * @param {number} currentScore - The current score of the current team (previous score + points)
+ * @param {number} timeRemaining - The number of milliseconds remaining on the timer when the turn ended
+ * @param {string} playerName - The name of the player who correctly guessed the word
+ */
 
 /**
  * Represents a Drawbotage game.
@@ -25,11 +41,14 @@ class Game {
     // both teams start with 0 points, and play commences from turn 1 of round 1
     this.redScore = 0;
     this.blueScore = 0;
+    this.redTotalDrawTime = 0;
+    this.blueTotalDrawTime = 0;
     this.round = 1;
     this.turn = 1;
     this.currentPlayer = null;
     this.currentWord = null;
     this.wordBank = new WordBank();
+    this.gameOver = false;
 
     // randomly pick a team
     this.prevTeam = Math.random() < 0.5 ? "blue" : "red";
@@ -49,55 +68,43 @@ class Game {
   }
 
   /**
-   * Plays the game.
+   * Plays the game. Turns will be played recursively until all rounds have been played out.
    */
   async play() {
-    this.assignNextTeam();
-
-    const [prevPlayers, currentPlayers] = this.getPlayers();
+    this.setNextTeam();
     const [prevTeamScore, currentTeamScore] = this.getScores();
 
+    // assign the next player unless there are not enough players on the current team
     try {
-      this.currentPlayer = currentPlayers.next();
-
-      // if the other team is behind by a certain amount, let a player from that team choose a drawbotage
-      if (prevTeamScore + 150 <= currentTeamScore) {
-        await this.selectDrawbotage();
-      }
-
-      this.currentWord = await this.selectWord();
-      const turnResult = await this.receiveGuesses(this.drawTime);
-      this.updateScore(turnResult.timeRemaining);
-
-      // ----- emit update -----
-      // reveal the word
-      // did someone guess correctly?
-      // new team scores
-
-      // this.updateTurn();
-      // if (this.round > this.rounds) {
-      // ----- end game -----
-      // emit end game message
-      // clean up room and release the associated memory
-      // this.connection.remove(this.roomId);
-      // return
-      // }
-
-      // recursively play until the game ends
-      // this.play();
+      this.setNextPlayer();
     } catch (err) {
-      // note-to-self: this block might throw an EmptyPlayerListError
-      // must emit message for client to end game
+      this.connection.emitError(
+        this.roomId,
+        "A team has less than 2 players left."
+      );
+      this.endGame(false);
+      return;
     }
-  }
 
-  /**
-   * Assigns the next team to be the active team. Also assigns the current team
-   * to be the previous team.
-   */
-  assignNextTeam() {
-    this.prevTeam = this.currentTeam;
-    this.currentTeam = this.currentTeam === "blue" ? "red" : "blue";
+    // if the other team is behind by a certain amount, let a player from that team choose a drawbotage
+    if (prevTeamScore + 150 <= currentTeamScore) {
+      await this.selectDrawbotage();
+    }
+
+    // have the player select a word, and start receiving guesses to check against
+    this.setCurrentWord(await this.selectWord());
+    const result = await this.receiveGuesses(this.drawTime * 1000);
+
+    // send the result of the turn to all clients, then update the turn status
+    this.endTurn(result);
+    this.nextTurn();
+
+    if (this.gameOver) {
+      this.endGame();
+      return;
+    }
+
+    this.play();
   }
 
   /**
@@ -118,6 +125,135 @@ class Game {
     const prevTeamScore = this[this.prevTeam + "Score"];
     const currentTeamScore = this[this.currentTeam + "Score"];
     return [prevTeamScore, currentTeamScore];
+  }
+
+  /**
+   * Returns the winner of the game. Ties are broken according to total draw time.
+   * @returns {string} winner - The name of the winning team
+   */
+  getWinner() {
+    let winner;
+    if (this.redScore > this.blueScore) {
+      winner = "red";
+    } else if (this.redScore < this.blueScore) {
+      winner = "blue";
+    } else {
+      winner = this.redTotalDrawTime >= this.blueTotalDrawTime ? "blue" : "red";
+    }
+
+    return winner;
+  }
+
+  /**
+   * Returns an object that contains information about the state of the game.
+   * @param {TurnResult} result - An object that contains information about the result of the most recent turn
+   * @returns {GameInfo}
+   */
+  getInfo(result) {
+    const [_, currentTeamScore] = this.getScores();
+
+    return {
+      word: this.currentWord,
+      points: result.points,
+      prevScore: currentTeamScore,
+      currentScore: currentTeamScore + result.points,
+      timeRemaining: result.timeRemaining,
+      playerName: result.playerName,
+    };
+  }
+
+  /**
+   * Sets the next team to be the current team. Also sets the current team to be the previous team.
+   */
+  setNextTeam() {
+    this.prevTeam = this.currentTeam;
+    this.currentTeam = this.currentTeam === "blue" ? "red" : "blue";
+  }
+
+  /**
+   * Sets the next player on the current team.
+   * @throws {EmptyPlayerListError}
+   */
+  setNextPlayer() {
+    const [currentPlayers] = this.getPlayers();
+    this.currentPlayer = currentPlayers.next();
+  }
+
+  /**
+   * Sets the current word in the game.
+   * @param {string} word - The word to set as the current word
+   */
+  setCurrentWord(word) {
+    this.currentWord = word;
+  }
+
+  /**
+   * Ends the current turn in the game.
+   * @param {TurnResult} result - An object that contains information about the result of the most recent turn
+   */
+  endTurn(result) {
+    // update the total draw time and score for the current team
+    this[this.currentTeam + "TotalDrawTime"] +=
+      this.drawTime - result.timeRemaining;
+    result.points = this.calculatePoints(result.timeRemaining);
+    this[this.currentTeam + "Score"] += result.points;
+
+    this.connection.emit("endTurn", this.getInfo(result));
+  }
+
+  /**
+   * Updates the turn and round status of the game.
+   */
+  nextTurn() {
+    this.turn++;
+
+    if (this.turn > this.turnsPerRound) {
+      this.round++;
+      this.turn = 1;
+    }
+
+    if (this.round > this.rounds) {
+      this.gameOver = true;
+    }
+  }
+
+  /**
+   * Ends the game and cleans up the associated room in memory.
+   * @param {boolean} withWinner - Whether the winner status should be emitted to client sockets
+   */
+  endGame(withWinner = true) {
+    if (withWinner) {
+      this.connection.emit("endGame", this.roomId, {
+        winner: this.getWinner(),
+      });
+    }
+
+    // clean up the room in memory
+    this.room.game = null;
+    this.connection.remove(this.roomId);
+  }
+
+  /**
+   * Calculates the point total for a given turn based on the draw time remaining.
+   * @param {number} drawTimeRemaining - The number of milliseconds remaining on the timer when the turn ended
+   * @param {number} points - The number of points the current team gained during the turn
+   */
+  calculatePoints(drawTimeRemaining) {
+    drawTimeRemaining /= 1000;
+    const frac = drawTimeRemaining / this.drawTime;
+    let points = 0;
+
+    if (frac >= 0.75) {
+      points = 100;
+    } else if (frac >= 0.5) {
+      points = 75;
+    } else if (frac >= 0.25) {
+      points = 60;
+    } else if (frac > 0) {
+      points = 50;
+    }
+
+    return points;
   }
 
   /**
@@ -144,6 +280,7 @@ class Game {
 
   /**
    * Lets a player from the non-current team select a drawbotage.
+   * @returns {string} The name of the selected drawbotage
    */
   async selectDrawbotage() {
     const [prevPlayers] = this.getPlayers();
@@ -175,10 +312,13 @@ class Game {
     this.connection.emit("drawbotageSelection", this.roomId, {
       selection: drawbotage,
     });
+
+    return drawbotage;
   }
 
   /**
    * Lets the current player select a word.
+   * @returns {string} The selected word
    */
   async selectWord() {
     // get three words from the word bank and let the active player choose one
@@ -211,65 +351,53 @@ class Game {
     return word;
   }
 
-  async receiveGuesses(ms) {
-    const checker = this.createGuessChecker(this.currentTeam);
-
-    const correctGuess = new Promise((resolve, reject) => {
-      this.connection.receiveGuesses(checker, (playerName, timeRemaining) => {
-        resolve({ playerName, timeRemaining });
-      });
-    });
-
-    const [result, intervalId] = intervalPromise(
-      ms,
-      correctGuess,
-      (timeRemaining) => {
-        this.connection.emit("guessTimer", this.roomId, { timeRemaining });
-      }
-    );
-
-    let turnResult = {};
-    try {
-      turnResult = await result;
-      clearInterval(intervalId);
-    } catch (err) {
-      turnResult.timeRemaining = 0;
-    }
-
-    return turnResult;
-  }
-
-  createGuessChecker = (currentTeam) => {
+  /**
+   * Creates a check function that validates incoming guesses.
+   * @returns {function} - A function that returns True if the guess is the current word, or False if it is incorrect
+   */
+  createGuessChecker = () => {
     return (guess, fromTeam) => {
-      if (fromTeam === currentTeam) {
+      if (fromTeam === this.currentTeam) {
         return guess.trim().toLowerCase() === this.currentWord;
       }
       return false;
     };
   };
 
-  updateScore(drawTimeRemaining) {
-    const percentTimeRemaining = Math.ceil(drawTimeRemaining / this.drawTime);
+  /**
+   * Allows client sockets to start sending in guesses for the current turn.
+   * @param {number} ms - The number of milliseconds before the turn automatically ends
+   * @returns {TurnResult} - An object that contains information about the result of the most recent turn
+   */
+  async receiveGuesses(ms) {
+    const check = this.createGuessChecker();
 
-    if (percentTimeRemaining >= 0.75) {
-      this[this.currentTeam + "Score"] += 100;
-    } else if (percentTimeRemaining >= 0.5) {
-      this[this.currentTeam + "Score"] += 75;
-    } else if (percentTimeRemaining >= 0.25) {
-      this[this.currentTeam + "Score"] += 60;
-    } else {
-      this[this.currentTeam + "Score"] += 50;
+    // use the check function to validate incoming guesses
+    // a correct guess will cause the promise to resolve
+    const guess = new Promise((resolve, reject) => {
+      this.connection.enableGuesses(check, (playerName, timeRemaining) => {
+        resolve({ playerName, timeRemaining });
+      });
+    });
+
+    // race the timer against the created promise
+    const [result, intervalId] = intervalPromise(ms, guess, (timeRemaining) => {
+      this.connection.emit("guessTimer", this.roomId, { timeRemaining });
+    });
+
+    // wait until either a player has correctly guessed the current word or until time has run out
+    // in either case, disallow guess events from impacting the state of the game beyond this point
+    let res = {};
+    try {
+      res = await result;
+      clearInterval(intervalId);
+    } catch (err) {
+      res.timeRemaining = 0;
+    } finally {
+      this.connection.disableGuesses();
     }
-  }
 
-  updateTurn() {
-    this.turn++;
-
-    if (this.turn > this.turnsPerRound) {
-      // reset player lists for the next round
-      this.round++;
-      this.turn = 1;
-    }
+    return res;
   }
 }
 
