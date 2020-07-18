@@ -1,14 +1,14 @@
-.form-button {
+.home-form-tab {
   cursor: pointer;
   position: relative;
   padding-bottom: 0.25rem;
 }
 
-.active-form-button {
+.home-form-tab--active {
   border-bottom: 2px solid;
 }
 
-.form-button:not(.active-form-button):hover .slider {
+.home-form-tab:not(.home-form-tab--active):hover .slider {
   width: 100%;
 }
 

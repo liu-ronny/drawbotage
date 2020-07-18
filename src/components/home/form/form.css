@@ -1,0 +1,35 @@
+.home-form {
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
+}
+
+.home-form input {
+  background-color: #f6f6f6;
+  border-color: #f6f6f6;
+  height: 60px;
+  border-radius: 5px;
+  transition: all 0.5s ease-in-out;
+}
+
+.home-form input:focus {
+  background-color: white;
+  border-color: #ccd2d9;
+  opacity: 0.8;
+}
+
+.home-form-join-tab-enter,
+.home-form-create-tab-enter {
+  opacity: 0;
+}
+
+.home-form-join-tab-enter-active,
+.home-form-create-tab-enter-active {
+  opacity: 1;
+  transition: opacity ease-in-out 1500ms;
+}
+
+.home-form-join-tab-enter-done,
+.home-form-create-tab-enter-done {
+  opacity: 1;
+}

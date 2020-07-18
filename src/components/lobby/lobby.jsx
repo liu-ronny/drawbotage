@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import Header from "../home/header";
+import Header from "../general/header/header";
 import Settings from "./settings";
 import Teams from "./teams";
 import Game from "../game/game";
-import connection from "../api/connection";
-import redirectOnReload from "../utils/redirectOnUnload";
+import connection from "../../api/connection";
+import redirectOnReload from "../../utils/redirectOnUnload";
 import "./lobby.css";
 
 class Lobby extends Component {

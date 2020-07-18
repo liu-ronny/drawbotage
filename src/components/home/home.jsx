@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Header from "./header";
+import Header from "../general/header/header";
 import "./home.css";
 
 class Home extends Component {
@@ -18,7 +18,7 @@ class Home extends Component {
 
   render() {
     return (
-      <div className="d-flex flex-column" id="content">
+      <div className="home-container d-flex flex-column">
         <div className="container">
           <Header />
           <div className="row justify-content-center">
@@ -26,11 +26,11 @@ class Home extends Component {
               {this.props.children}
             </div>
           </div>
-          <p className="text-center mt-5 text-secondary font-weight-bold">
+          <p className="text-secondary font-weight-bold text-center mt-5">
             How to play
           </p>
         </div>
-        <div id="background-container"></div>
+        <div className="home-background"></div>
       </div>
     );
   }

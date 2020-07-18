@@ -1,19 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap");
 
-#header-text,
-#header-logo {
+.header-text,
+.header-logo {
   font-family: "Caveat", cursive;
   font-size: 4rem;
   font-weight: bold;
 }
-
-/* #logo {
-  transition: transform ease-out 1.5s;
-}
-
-#logo:hover {
-  transform: rotate(360deg);
-} */
 
 #logo-gradient {
   --color-stop-1: #41e8ad;

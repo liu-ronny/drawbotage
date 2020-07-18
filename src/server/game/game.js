@@ -1,6 +1,6 @@
 const PlayerList = require("./playerList");
 const WordBank = require("./wordBank");
-const { intervalPromise } = require("../utils/promises");
+const { intervalPromise } = require("../../utils/promises");
 
 /**
  * @typedef {object} TurnResult

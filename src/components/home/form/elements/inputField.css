@@ -1,8 +1,4 @@
-.error-msg {
-  color: #dc3545;
-}
-
-.input-field-error {
+.home-form-input-field--error {
   border-color: #dc3545 !important;
   background-color: white !important;
 }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Header from "./home/header";
+import Header from "./general/header/header";
 import "./loadingScreen.css";
 
 class LoadingScreen extends Component {
