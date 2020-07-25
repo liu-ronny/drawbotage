@@ -5,9 +5,12 @@ import { timeoutPromise } from "../utils/promises";
  * @returns {string} - A UUID that identifies the new room
  * @throws {Error}
  */
-async function getRoomId() {
+async function createRoomId() {
   try {
-    const response = await timeoutPromise(5000, fetch("/roomid"));
+    const response = await timeoutPromise(
+      5000,
+      fetch("/rooms", { method: "POST" })
+    );
     const roomId = await response.text();
     return roomId;
   } catch (err) {
@@ -15,4 +18,4 @@ async function getRoomId() {
   }
 }
 
-export default getRoomId;
+export default createRoomId;

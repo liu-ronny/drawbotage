@@ -1,0 +1,13 @@
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 9999;
+  background-color: aliceblue;
+  pointer-events: none;
+  font-size: 2rem;
+  border: 5px solid aliceblue;
+  border-radius: 10px;
+}

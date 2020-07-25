@@ -3,45 +3,21 @@ import Header from "./header";
 import Teams from "./teams";
 import Canvas from "../canvas/canvas";
 import Chat from "./chat/chat";
+import Loader from "../general/loader/loader";
 import connection from "../../api/connection";
 import "./game.css";
+import WordDisplay from "./wordDisplay/wordDisplay";
 
 class Game extends Component {
-  state = {
-    activePlayerName: null,
-  };
-
   componentDidMount() {
-    // temporary
-    // document.body.style.backgroundColor = "aliceblue";
-    // document.body.style.height = "100%";
-    // document.documentElement.style.height = "100%";
-
     document.body.style.backgroundColor = "";
-    connection.unsubscribeFromLobby();
   }
 
+  handleWordSelection = (word) => {
+    this.props.dispatch({ type: "WORD_SELECTED", word });
+  };
+
   render() {
-    // const redPlayerNames = [
-    //   "Sandra Mann",
-    //   "Terrell Thatcher",
-    //   "Annabelle Jarvis",
-    //   "Ikrah Hubbard",
-    //   "Mehmet Vaughn",
-    // ];
-
-    // const bluePlayerNames = [
-    //   "Gurleen Giles",
-    //   "Aditya Crawford",
-    //   "Celine Hobbs",
-    //   "Jamaal Suarez",
-    //   "Eva-Rose Wagner",
-    // ];
-
-    // const unassignedPlayerNames = ["Hello"];
-
-    // const activePlayerName = "Annabelle Jarvis";
-
     return (
       <div className="container-fluid vh-100">
         <div className="d-flex flex-column h-100">
@@ -51,19 +27,24 @@ class Game extends Component {
               <div className="row game-container justify-content-center h-100">
                 <div className="col-2">
                   <Teams
-                    redPlayerNames={this.props.gameInfo.redPlayerNames}
-                    bluePlayerNames={this.props.gameInfo.bluePlayerNames}
+                    redPlayerNames={this.props.game.redPlayerNames}
+                    bluePlayerNames={this.props.game.bluePlayerNames}
                     unassignedPlayerNames={
-                      this.props.gameInfo.unassignedPlayerNames
+                      this.props.game.unassignedPlayerNames
                     }
-                    // redPlayerNames={redPlayerNames}
-                    // bluePlayerNames={bluePlayerNames}
-                    // unassignedPlayerNames={unassignedPlayerNames}
-                    activePlayerName={this.props.gameInfo.activePlayerName}
+                    currentPlayerName={this.props.game.currentPlayerName}
                   />
                 </div>
                 <div className="col-6 col-lg-7">
-                  <Canvas />
+                  <WordDisplay coveredWord={this.props.game.coveredWord} />
+                  <Canvas
+                    disabled={
+                      this.props.game.playerName !==
+                      this.props.game.currentPlayerName
+                    }
+                    game={this.props.game}
+                    onWordSelection={this.handleWordSelection}
+                  />
                 </div>
                 <div className="col-4 col-lg-3 mh-100">
                   <Chat />

@@ -16,7 +16,45 @@ function gameStateReducer(state, action) {
       newState.disconnectedMsg = action.message;
       break;
     case "START_GAME":
-      newState.startGame = true;
+      newState.start = true;
+      break;
+    case "SET_CURRENT_PLAYER":
+      newState.currentPlayerName = action.currentPlayerName;
+      break;
+    case "WAIT_FOR_WORD_SELECTION":
+      newState.wordSelector = action.selector;
+      break;
+    case "SELECT_WORD":
+      newState.wordChoices = action.wordChoices;
+      newState.respondWithWord = action.respondWithWord;
+      break;
+    case "SELECT_WORD_TIMER":
+      newState.wordSelectionTimeRemaining = action.timeRemaining / 1000;
+      break;
+    case "WORD_SELECTED":
+      newState.wordChoices = null;
+
+      if (newState.respondWithWord) {
+        newState.respondWithWord(action.word);
+        newState.respondWithWord = null;
+      }
+
+      break;
+    case "WORD_SELECTION":
+      let coveredWord = "";
+
+      for (let i = 0; i < action.wordLength; i++) {
+        coveredWord += action.spacesAt.includes(i) ? " " : "_";
+      }
+
+      newState.coveredWord = coveredWord;
+      newState.wordSelector = null;
+      newState.wordChoices = null;
+      newState.respondWithWord = null;
+      newState.wordSelectionTimeRemaining = null;
+      break;
+    case "END_TURN":
+      newState.coveredWord = null;
       break;
     default:
       return state;

@@ -77,10 +77,13 @@ class Game {
     // assign the next player unless there are not enough players on the current team
     try {
       this.setNextPlayer();
+      this.connection.emit("setCurrentPlayer", this.roomId, {
+        currentPlayerName: this.currentPlayer,
+      });
     } catch (err) {
       this.connection.emitError(
         this.roomId,
-        "A team has less than 2 players left."
+        "The game ended because at least one of teams has less than 2 players left."
       );
       this.endGame(false);
       return;
@@ -104,6 +107,7 @@ class Game {
       return;
     }
 
+    this.connection.emit("setCurrentPlayer", this.roomId, {});
     this.play();
   }
 
@@ -198,7 +202,7 @@ class Game {
     result.points = this.calculatePoints(result.timeRemaining);
     this[this.currentTeam + "Score"] += result.points;
 
-    this.connection.emit("endTurn", this.getInfo(result));
+    this.connection.emit("endTurn", this.roomId, this.getInfo(result));
   }
 
   /**
@@ -335,7 +339,7 @@ class Game {
       "selectWord",
       socket,
       words,
-      10000
+      15000
     );
 
     try {
@@ -347,8 +351,30 @@ class Game {
     }
 
     // emit the word selection to all clients
-    this.connection.emit("wordSelection", this.roomId, { selection: word });
+    const spacesAt = this.getSpacePositions(word);
+    this.connection.emit("wordSelection", this.roomId, {
+      wordLength: word.length,
+      spacesAt,
+    });
     return word;
+  }
+
+  /**
+   * Returns the indices of all spaces in a word.
+   * @param {string} word - The input word
+   */
+  getSpacePositions(word) {
+    const positions = [];
+
+    for (let i = 0; i < word.length; i++) {
+      const ch = word[i];
+
+      if (ch === " ") {
+        positions.push(i);
+      }
+    }
+
+    return positions;
   }
 
   /**

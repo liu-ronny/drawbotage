@@ -27,8 +27,19 @@ class Teams extends Component {
   render() {
     return (
       <div className="whiteboard p-4 pl-5">
-        <div className="row text-primary teams-header font-weight-bold">
-          Teams
+        <div className="d-flex text-primary teams-header font-weight-bold align-items-center">
+          <div>Teams</div>
+          {this.props.error ? (
+            <div
+              className="error-alert alert alert-primary text-center flex-grow-1 ml-3 mb-0"
+              role="alert"
+              onClick={this.props.onErrorClose}
+            >
+              <i class="fas fa-exclamation-circle mr-2"></i>
+              There must be at least 2 players on each team before the game can
+              start.
+            </div>
+          ) : null}
         </div>
         <div className="row team-boxes mt-5">
           <TeamBox

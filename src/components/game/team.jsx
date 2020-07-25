@@ -17,8 +17,8 @@ class Team extends Component {
           <PlayerName
             key={playerName}
             name={playerName}
-            isActive={playerName === this.props.activePlayerName}
-            activePlayerClassName={this.props.activePlayerClassName}
+            isCurrentPlayer={playerName === this.props.currentPlayerName}
+            currentPlayerClassName={this.props.currentPlayerClassName}
           />
         ))}
       </div>

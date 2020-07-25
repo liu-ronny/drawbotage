@@ -12,16 +12,16 @@ class Teams extends Component {
             teamName="Team1"
             iconClassName="fas fa-pencil-ruler"
             playerNames={this.props.redPlayerNames}
-            activePlayerName={this.props.activePlayerName}
-            activePlayerClassName="alert-primary"
+            currentPlayerName={this.props.currentPlayerName}
+            currentPlayerClassName="alert-primary"
           />
           <Team
             className="game-team-2"
             teamName="Team2"
             iconClassName="fas fa-drafting-compass"
             playerNames={this.props.bluePlayerNames}
-            activePlayerName={this.props.activePlayerName}
-            activePlayerClassName="alert-light-primary"
+            currentPlayerName={this.props.currentPlayerName}
+            currentPlayerClassName="alert-light-primary"
           />
           <Team
             className="game-spectators"

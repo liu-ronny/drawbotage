@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import paper from "paper/dist/paper-core";
 import CanvasManager from "./paper/canvasManager";
 import Toolbar from "./toolbar";
+import Loader from "../general/loader/loader";
+import WordChoices from "./selectionScreens/wordChoices";
 import "./canvas.css";
 
 class Canvas extends Component {
@@ -59,6 +61,22 @@ class Canvas extends Component {
     this.setState({ activeTool: this.canvasManager.activeTool });
   }
 
+  componentDidUpdate(prevProps) {
+    const wasCurrentPlayer =
+      prevProps.game.playerName === prevProps.game.currentPlayerName;
+    const isCurrentPlayer =
+      this.props.game.playerName === this.props.game.currentPlayerName;
+
+    if (!wasCurrentPlayer && isCurrentPlayer) {
+      this.canvasManager.activate();
+      return;
+    }
+
+    if (wasCurrentPlayer && !isCurrentPlayer) {
+      this.canvasManager.deactivate();
+    }
+  }
+
   componentWillUnmount() {
     // window.removeEventListener("load", this.handleLoad);
     window.removeEventListener("resize", this.resizeCanvas);
@@ -90,6 +108,20 @@ class Canvas extends Component {
       <div>
         <div className="canvas" ref={this.paperContainerRef}>
           <canvas id="canvas" ref={this.paperRef}></canvas>
+
+          {this.props.game.wordSelector ? (
+            <Loader
+              message={`Waiting for ${this.props.game.wordSelector} to select a word...`}
+            />
+          ) : null}
+
+          {this.props.game.wordChoices ? (
+            <WordChoices
+              words={this.props.game.wordChoices}
+              timeRemaining={this.props.game.wordSelectionTimeRemaining}
+              onWordSelection={this.props.onWordSelection}
+            />
+          ) : null}
         </div>
         <div className="row no-gutters mt-3">
           <Toolbar
@@ -140,14 +172,14 @@ class Canvas extends Component {
             //   this.canvasManager.drawbotages.hideTool.activate();
             //   this.setState({ activeTool: this.canvasManager.activeTool });
             // }}
-            onColorClick={() => {
-              this.canvasManager.drawbotages.colorTool.activate();
-              this.setState({ activeTool: this.canvasManager.activeTool });
-            }}
-            onBulldozeClick={() => {
-              this.canvasManager.drawbotages.bulldozeTool.activate();
-              this.setState({ activeTool: this.canvasManager.activeTool });
-            }}
+            // onColorClick={() => {
+            //   this.canvasManager.drawbotages.colorTool.activate();
+            //   this.setState({ activeTool: this.canvasManager.activeTool });
+            // }}
+            // onBulldozeClick={() => {
+            //   this.canvasManager.drawbotages.bulldozeTool.activate();
+            //   this.setState({ activeTool: this.canvasManager.activeTool });
+            // }}
           />
         </div>
       </div>

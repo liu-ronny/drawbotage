@@ -1,29 +1,31 @@
-import React, { useState, useEffect, useLayoutEffect, useReducer } from "react";
-import { Redirect, useHistory } from "react-router-dom";
+import React, { useState, useEffect, useReducer } from "react";
+import { Redirect } from "react-router-dom";
 import Header from "../general/header/header";
 import Settings from "./settings/settings";
 import Teams from "./teams/teams";
-// import Game from "../game/game";
+import Game from "../game/game";
 import gameStateReducer from "./gameStateReducer";
-import connection from "../../api/testConnection";
-// import redirectOnUnload from "../../utils/hooks/useRedirectOnUnload";
+import connection from "../../api/connection";
 import "./lobby.css";
 
 const initialGameState = {
   host: "",
+  playerName: "",
+  currentPlayerName: "",
   bluePlayerNames: [],
   redPlayerNames: [],
   unassignedPlayerNames: [],
-  startGame: false,
+  start: false,
   rounds: 3,
   drawTime: 60,
-  displayPlayerTags: true,
 };
 
 function Lobby(props) {
   const { playerName, roomId, joinRoom, createRoom } = props;
   initialGameState.host = createRoom ? playerName : "";
+  initialGameState.playerName = playerName;
   const [game, dispatch] = useReducer(gameStateReducer, initialGameState);
+  const [error, setError] = useState(false);
 
   const handleChange = (event, settingName) => {
     connection.emit("updateSettings", {
@@ -32,9 +34,19 @@ function Lobby(props) {
       settingValue: Number(event.target.value),
     });
   };
-  const handleStart = () => connection.emit("startGame", { roomId });
+  const handleStart = () => {
+    if (game.bluePlayerNames.length < 2 || game.redPlayerNames.length < 2) {
+      setError(true);
+      return;
+    }
+
+    connection.emit("startGame", { roomId });
+  };
+
   const handleLeave = () =>
     connection.emit("leaveGame", { roomId, playerName });
+
+  const handleErrorClose = () => setError(false);
 
   const updateTeams = (team, index, name) => {
     connection.emit("updateTeams", {
@@ -54,6 +66,10 @@ function Lobby(props) {
     });
     return () => connection.close();
   }, []);
+
+  if (game.start) {
+    return <Game game={game} dispatch={dispatch} />;
+  }
 
   if (game.disconnected) {
     return (
@@ -95,6 +111,8 @@ function Lobby(props) {
               unassignedPlayerNames={game.unassignedPlayerNames}
               updateTeams={updateTeams}
               displayPlayerTags={game.displayPlayerTags}
+              error={error}
+              onErrorClose={handleErrorClose}
             />
           </div>
         </div>

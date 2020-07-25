@@ -40,6 +40,7 @@ class CanvasManager {
     this.drawLayer = paper.project.activeLayer;
     this.eraseLayer = new paper.Layer();
 
+    this.disabledTool = new paper.Tool();
     this.drawingTool = new DrawingTool(paper, this);
     this.eraserTool = new EraserTool(paper, this, defaults.eraserSizes);
     this.clearTool = new ClearTool(paper, this);
@@ -51,8 +52,10 @@ class CanvasManager {
       bulldozeTool: new BulldozeTool(paper, this),
     };
 
-    this.drawingTool.activate();
-    this.activeTool = "drawing";
+    // this.drawingTool.activate();
+    // this.activeTool = "drawing";
+    this.disabledTool.activate();
+    this.activeTool = "disabled";
   }
 
   /**
@@ -89,6 +92,15 @@ class CanvasManager {
       this.prevWidth = currentWidth;
     }
   };
+
+  activate() {
+    this.drawingTool.activate();
+    this.activeTool = "drawing";
+  }
+
+  deactivate() {
+    this.disabledTool.activate();
+  }
 }
 
 export default CanvasManager;

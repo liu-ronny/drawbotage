@@ -14,7 +14,7 @@ app.use(function (req, res, next) {
 
 const connection = new Connection(server);
 
-app.get("/roomid", (req, res) => {
+app.post("/rooms", (req, res) => {
   let roomId = uuid();
 
   while (connection.contains(roomId)) {
@@ -24,21 +24,22 @@ app.get("/roomid", (req, res) => {
   res.send(roomId);
 });
 
-app.get("/is-valid-roomID/:roomID", (req, res) => {
-  const roomId = req.params.roomID;
+app.get("/rooms/valid/:id", (req, res) => {
+  const roomId = req.params.id;
   res.send(connection.contains(roomId));
 });
 
-app.get("/is-valid-name/:roomID/:playerName", (req, res) => {
+app.get("/rooms/:roomID/players/:playerName", (req, res) => {
   const roomId = req.params.roomID;
   const playerName = req.params.playerName;
 
-  if (!connection.contains(roomId)) {
-    res.send(false);
+  if (connection.contains(roomId)) {
+    const playerNameIsTaken = connection.rooms.get(roomId).contains(playerName);
+    res.send(playerNameIsTaken);
+    return;
   }
 
-  const playerNameIsTaken = connection.rooms.get(roomId).contains(playerName);
-  res.send(playerNameIsTaken);
+  res.send(false);
 });
 
 server.listen(8080, () => {

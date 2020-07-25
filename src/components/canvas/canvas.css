@@ -1,5 +1,5 @@
 .canvas {
-  /* border: 2px solid #aab7b8; */
+  position: relative;
   border: 5px solid #d0d3d6;
   border-radius: 10px;
   cursor: url("../../images/circle.svg"), default;

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import Header from "../general/header/header";
 import Alert from "../general/alert/alert";
-import getRoomId from "../../api/getRoomId";
+import createRoomId from "../../api/createRoomId";
 import "./home.css";
 import { useState } from "react";
 import Form from "./form/form";
@@ -39,7 +39,7 @@ function Home(props) {
     const { name, roomName } = values;
 
     try {
-      var roomId = await getRoomId();
+      var roomId = await createRoomId();
 
       setCreateRoomError(false);
       setStatus({

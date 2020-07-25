@@ -212,8 +212,6 @@ class Room {
     } catch (err) {
       console.log(err);
     }
-
-    // this.connection.remove(this.roomId);
   }
 }
 

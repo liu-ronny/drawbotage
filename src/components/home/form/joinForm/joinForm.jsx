@@ -1,8 +1,9 @@
-import React, { Component } from "react";
+import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputField from "../elements/inputField";
 import validateRoomId from "../../../../api/validateRoomId";
+import validatePlayerName from "../../../../api/validatePlayerName";
 
 function JoinForm(props) {
   function handleSubmit(values, { setSubmitting }) {
@@ -23,7 +24,17 @@ function JoinForm(props) {
       validationSchema={Yup.object({
         name: Yup.string()
           .max(50, "Must be 100 characters or less")
-          .required("Required"),
+          .required("Required")
+          .ensure()
+          .test(
+            "player name is valid",
+            "Someone is already using that name",
+            function (val) {
+              val = val || "invalid";
+              const roomId = this.resolve(Yup.ref("roomId")) || "invalid";
+              return validatePlayerName(roomId, val);
+            }
+          ),
         roomId: Yup.string()
           .required("Required")
           .test("room ID is valid", "Invalid room ID", validateRoomId),
