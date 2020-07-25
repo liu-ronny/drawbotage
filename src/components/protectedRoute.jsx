@@ -1,46 +1,48 @@
-import React, { Component } from "react";
-import { Route, Redirect } from "react-router-dom";
-import Game from "./game/game";
+import React from "react";
+import { Route, Redirect, useLocation } from "react-router-dom";
+import Lobby from "./lobby/lobby";
+import Game from "../components/game/game";
+import checkUuid from "../utils/checkUuid";
+import Home from "./home/home";
+import Reload from "./general/reload/reload";
 
-class ProtectedRoute extends Component {
-  isUUID(str) {
-    const pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return pattern.test(str);
-  }
+function ProtectedRoute(props) {
+  const location = useLocation();
+  const state = location.state;
+  const roomId = location.pathname.substring(1);
+  const isValidRoomId = checkUuid(roomId);
 
-  render() {
-    const { component: Component, ...props } = this.props;
-    const { pathname = "", state } = props.location;
-    const roomId = pathname.substring(1);
-    const isValidRoomId = this.isUUID(roomId);
-
-    if (!isValidRoomId) {
-      return <Redirect to="/" />;
-    }
-
-    if (state) {
-      if (state.fromLobby) {
-        return <Route {...props} render={(state) => <Game {...state} />} />;
-      }
-
-      return (
-        <Route
-          path="/:id"
-          {...props}
-          render={(props) => <Component {...props} />}
-        />
-      );
-    }
-
-    return (
-      <Redirect
-        to={{
-          pathname: "/",
-          state: { roomId },
-        }}
-      />
+  if (!state) {
+    return isValidRoomId ? (
+      <Route>
+        <Home roomId={roomId} />
+      </Route>
+    ) : (
+      <Redirect to="/" />
     );
   }
+
+  const { startGame, joinRoom, createRoom } = state;
+
+  if (joinRoom || createRoom) {
+    return (
+      <Route path="/:id">
+        <Reload>
+          <Lobby {...state} />
+        </Reload>
+      </Route>
+    );
+  }
+
+  if (startGame) {
+    return (
+      <Route path="/:id">
+        <Game state={state} />
+      </Route>
+    );
+  }
+
+  return <Redirect to="/" />;
 }
 
 export default ProtectedRoute;

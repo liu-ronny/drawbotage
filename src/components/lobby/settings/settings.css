@@ -1,0 +1,10 @@
+.lobby-settings-header {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: left;
+}
+
+.larger-bold-font {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+}

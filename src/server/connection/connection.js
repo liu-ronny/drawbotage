@@ -34,6 +34,8 @@ class Connection {
         const room = new Room(this, data.roomId, data.rounds, data.drawTime);
         room.add(data.playerName, socket);
         room.setHost(data.playerName, socket);
+        room.updateSettings("rounds", 3);
+        room.updateSettings("drawTime", 60);
         this.rooms.set(data.roomId, room);
         this.joinRoom(data, socket);
 

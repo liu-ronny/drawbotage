@@ -12,6 +12,7 @@ class TeamBox extends Component {
       dragula,
       updateTeams,
       host,
+      displayPlayerTags,
     } = this.props;
 
     return (
@@ -37,6 +38,7 @@ class TeamBox extends Component {
                 teamName={teamName}
                 playerNames={playerNames}
                 updateTeams={updateTeams}
+                displayPlayerTags={displayPlayerTags}
               />
             </div>
           </div>
