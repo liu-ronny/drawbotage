@@ -1,12 +1,11 @@
 import React, { Component } from "react";
-import DynamicLabel from "./dynamicLabel";
 
 class ChatSender extends Component {
   render() {
     return (
-      <DynamicLabel className="chat-sender">
+      <>
         <input
-          className="d-inline p-2 chat-sender-input border-right"
+          className="col p-2 chat-sender-input border-right"
           type="text"
           placeholder="Type guess here..."
           disabled={this.props.disabled}
@@ -18,7 +17,7 @@ class ChatSender extends Component {
           }}
         />
         <div
-          className="d-inline chat-sender-button text-center"
+          className="col-auto d-flex align-items-center chat-sender-button text-center"
           onClick={(event) => {
             const input = event.currentTarget.previousSibling;
             if (!this.props.disabled && input.value) {
@@ -29,7 +28,7 @@ class ChatSender extends Component {
         >
           <i className="far fa-paper-plane"></i>
         </div>
-      </DynamicLabel>
+      </>
     );
   }
 }

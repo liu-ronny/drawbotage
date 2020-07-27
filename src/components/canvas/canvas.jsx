@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import paper from "paper/dist/paper-core";
 import CanvasManager from "./paper/canvasManager";
 import Toolbar from "./toolbar";
-import Loader from "../general/loader/loader";
-import WordChoices from "./selectionScreens/wordChoices";
+import Selection from "../game/screens/selection/selection";
+import WordChoices from "../game/screens/wordChoices/wordChoices";
 import "./canvas.css";
 
 class Canvas extends Component {
@@ -109,19 +109,29 @@ class Canvas extends Component {
         <div className="canvas" ref={this.paperContainerRef}>
           <canvas id="canvas" ref={this.paperRef}></canvas>
 
-          {this.props.game.wordSelector ? (
-            <Loader
-              message={`Waiting for ${this.props.game.wordSelector} to select a word...`}
+          {this.props.game.wordSelector && (
+            <Selection
+              selector={this.props.game.wordSelector}
+              timeRemaining={this.props.game.wordSelectionTimeRemaining}
+              type="word"
             />
-          ) : null}
+          )}
 
-          {this.props.game.wordChoices ? (
+          {this.props.game.drawbotageSelector && (
+            <Selection
+              selector={this.props.game.drawbotageSelector}
+              timeRemaining={this.props.game.drawbotageSelectionTimeRemaining}
+              type="drawbotage"
+            />
+          )}
+
+          {this.props.game.wordChoices && (
             <WordChoices
               words={this.props.game.wordChoices}
               timeRemaining={this.props.game.wordSelectionTimeRemaining}
               onWordSelection={this.props.onWordSelection}
             />
-          ) : null}
+          )}
         </div>
         <div className="row no-gutters mt-3">
           <Toolbar

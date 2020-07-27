@@ -59,11 +59,25 @@ class Connection {
       dispatch(data);
     });
 
+    this.socket.on("waitForDrawbotageSelection", (data) => {
+      data.type = "WAIT_FOR_DRAWBOTAGE_SELECTION";
+      dispatch(data);
+    });
+
     this.socket.on("selectWord", (data, respondWithWord) => {
       dispatch({
         type: "SELECT_WORD",
         respondWithWord,
-        wordChoices: data,
+        wordChoices: data.words,
+        timeRemaining: data.timeRemaining,
+      });
+    });
+
+    this.socket.on("selectDrawbotage", (data, respondWithDrawbotage) => {
+      dispatch({
+        type: "SELECT_DRAWBOTAGE",
+        respondWithDrawbotage,
+        timeRemaining: data.timeRemaining,
       });
     });
 
@@ -72,8 +86,18 @@ class Connection {
       dispatch(data);
     });
 
+    this.socket.on("selectDrawbotageTimer", (data) => {
+      data.type = "SELECT_DRAWBOTAGE_TIMER";
+      dispatch(data);
+    });
+
     this.socket.on("wordSelection", (data) => {
       data.type = "WORD_SELECTION";
+      dispatch(data);
+    });
+
+    this.socket.on("drawbotageSelection", (data) => {
+      data.type = "DRAWBOTAGE_SELECTION";
       dispatch(data);
     });
 

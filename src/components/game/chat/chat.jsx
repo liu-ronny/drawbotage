@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import SectionHeader from "../sectionHeader";
+import ChatHeader from "./chatHeader";
 import ChatConversation from "./chatConversation";
 import ChatSender from "./chatSender";
 import "./chat.css";
@@ -34,17 +34,22 @@ class Chat extends Component {
 
   render() {
     return (
-      <>
-        <div className="chat h-100">
-          <SectionHeader
-            text="Chat"
-            iconClassName="fas fa-comments"
-            className="chat-header pl-3"
-          />
-          <ChatConversation messages={this.state.messages} />
-          <ChatSender onSend={this.handleSend} disabled={this.state.disabled} />
+      <div className="chat row h-100">
+        <div className="col-12 d-flex flex-column">
+          <div className="row">
+            <ChatHeader />
+          </div>
+          <div className="row flex-grow-1">
+            <ChatConversation messages={this.state.messages} />
+          </div>
+          <div className="row">
+            <ChatSender
+              onSend={this.handleSend}
+              disabled={this.state.disabled}
+            />
+          </div>
         </div>
-      </>
+      </div>
     );
   }
 }

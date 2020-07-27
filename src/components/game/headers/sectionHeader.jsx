@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import "./sectionHeader.css";
-import DynamicLabel from "./chat/dynamicLabel";
 
 class SectionHeader extends Component {
   render() {
@@ -8,10 +7,10 @@ class SectionHeader extends Component {
     className = className ? className : "";
 
     return (
-      <DynamicLabel className={"game-section-header " + className}>
+      <div className={"game-section-header " + className}>
         <i className={iconClassName + " pr-2"}></i>
         {text}
-      </DynamicLabel>
+      </div>
     );
   }
 }

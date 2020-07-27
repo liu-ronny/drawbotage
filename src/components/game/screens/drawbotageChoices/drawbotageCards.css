@@ -1,0 +1,50 @@
+.game-drawbotage-card {
+  height: 300px;
+  width: 200px;
+  text-align: center;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin: 25px 0;
+  padding: 10px;
+  box-shadow: 0px 5px 10px 3px rgba(0, 0, 0, 0.065);
+  user-select: none;
+}
+
+.game-drawbotage-card-title {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.game-drawbotage-card-text {
+  font-weight: 500;
+}
+
+.game-drawbotage-cards {
+  color: #5d6d7e;
+}
+
+.game-drawbotage-cards-arrow {
+  cursor: pointer;
+}
+
+.game-drawbotage-card-reverse {
+  background-color: #d6eaf8;
+  color: #2874a6;
+}
+
+.game-drawbotage-card-hide {
+  background-color: #d1f2eb;
+  color: #148f77;
+}
+
+.game-drawbotage-card-color {
+  background-color: #fcf3cf;
+  color: #b7950b;
+}
+
+.game-drawbotage-card-bulldoze {
+  background-color: #f6ddcc;
+  color: #a04000;
+}

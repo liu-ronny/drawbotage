@@ -4,7 +4,7 @@ import ChatMessage from "./chatMessage";
 class ChatConversation extends Component {
   render() {
     return (
-      <div className="chat-conversation py-2 px-1 bg-light border-top border-bottom">
+      <div className="chat-conversation col-12 bg-light border-top border-bottom">
         {this.props.messages.map((message) => {
           return (
             <ChatMessage

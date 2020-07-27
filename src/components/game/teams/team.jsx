@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import SectionHeader from "./sectionHeader";
+import SectionHeader from "../headers/sectionHeader";
 import PlayerName from "./playerName";
 
 class Team extends Component {
@@ -7,7 +7,7 @@ class Team extends Component {
     const className = this.props.className ? this.props.className : "";
 
     return (
-      <div className={className}>
+      <div className={className + " col-12"}>
         <SectionHeader
           text={this.props.teamName}
           iconClassName={this.props.iconClassName}

@@ -1,0 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+
+.game-drawbotage-modal {
+  font-family: "Montserrat", sans-serif;
+  color: #5d6d7e;
+  user-select: none;
+}
+
+.game-drawbotage-modal-title {
+  font-weight: 700;
+}

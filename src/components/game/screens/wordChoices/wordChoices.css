@@ -1,0 +1,5 @@
+.game-word-choice {
+  font-size: 1.5rem;
+  pointer-events: all;
+  cursor: pointer;
+}

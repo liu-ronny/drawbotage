@@ -293,7 +293,10 @@ class Game {
 
     socket
       .to(this.roomId)
-      .broadcast.emit("waitForDrawbotageSelection", { selector });
+      .broadcast.emit("waitForDrawbotageSelection", {
+        selector,
+        timeRemaining: 20000,
+      });
 
     // give the player 10 seconds to select a drawbotage before selecting one at random
     let drawbotage;
@@ -301,7 +304,7 @@ class Game {
       "selectDrawbotage",
       socket,
       this.drawbotages,
-      10000
+      20000
     );
 
     try {
@@ -331,6 +334,7 @@ class Game {
 
     socket.to(this.roomId).broadcast.emit("waitForWordSelection", {
       selector: this.currentPlayer,
+      timeRemaining: 20000,
     });
 
     // give the player 10 seconds to select a word before selecting one at random
@@ -338,8 +342,8 @@ class Game {
     const [response, timerId] = this.getResponse(
       "selectWord",
       socket,
-      words,
-      15000
+      { words, timeRemaining: 20000 },
+      20000
     );
 
     try {

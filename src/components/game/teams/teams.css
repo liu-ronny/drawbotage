@@ -1,0 +1,12 @@
+.game-teams-container {
+  border: 1px solid #d0d3d6;
+  user-select: none;
+}
+
+.game-team-1-header {
+  color: #5499c7;
+}
+
+.game-team-2-header {
+  color: #52be80;
+}
