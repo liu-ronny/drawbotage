@@ -11,7 +11,7 @@ function Error(props) {
 
   return (
     <div className={className}>
-      <small data-testid="formError">{props.text}</small>
+      <small>{props.text}</small>
     </div>
   );
 }

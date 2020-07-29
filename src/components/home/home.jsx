@@ -1,11 +1,10 @@
-import React, { useEffect } from "react";
-import { Redirect, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Redirect, useLocation, Link } from "react-router-dom";
 import Header from "../general/header/header";
 import Alert from "../general/alert/alert";
+import Form from "./form/form";
 import createRoomId from "../../api/createRoomId";
 import "./home.css";
-import { useState } from "react";
-import Form from "./form/form";
 
 function Home(props) {
   const [status, setStatus] = useState({
@@ -19,9 +18,7 @@ function Home(props) {
   const location = useLocation();
   const fromWindowUnload = location.state && location.state.fromWindowUnload;
 
-  // if (fromWindowUnload) {
   window.sessionStorage.removeItem("windowUnload");
-  // }
 
   function handleJoin(values) {
     const { roomId, name } = values;
@@ -97,9 +94,11 @@ function Home(props) {
             />
           </div>
         </div>
-        <p className="text-secondary font-weight-bold text-center mt-5">
-          How to play
-        </p>
+        <div className="text-center mt-5">
+          <Link to="/about">
+            <span className="text-secondary font-weight-bold">How to play</span>
+          </Link>
+        </div>
       </div>
       <div className="home-background"></div>
     </div>

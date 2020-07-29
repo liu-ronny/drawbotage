@@ -1,142 +1,147 @@
 import React from "react";
-import "@testing-library/jest-dom";
-import {
-  render,
-  fireEvent,
-  wait,
-  waitForElementToBeRemoved,
-} from "@testing-library/react";
-import App from "../../../App";
+import { Router, Route } from "react-router-dom";
+import { createMemoryHistory } from "history";
+import { render, fireEvent } from "@testing-library/react";
+import Home from "../home";
+import createRoomId from "../../../api/createRoomId";
+import validateRoomId from "../../../api/validateRoomId";
+import validatePlayerName from "../../../api/validatePlayerName";
 
-jest.mock("../../api/getRoomId", () => {
-  return jest.fn(() => "41de3945-703e-40b3-b2c3-a31c2071cbc8");
-});
+jest.mock("../../../api/createRoomId");
+jest.mock("../../../api/validateRoomId");
+jest.mock("../../../api/validatePlayerName");
 
-jest.mock("../../api/validateRoomId", () => {
-  return jest.fn(() => true);
-});
-
-jest.mock("../../api/connection", () => {
-  return { subscribeFromLobby: jest.fn(), unsubscribeFromLobby: jest.fn() };
-});
-
-function renderApp(props) {
-  return render(<App {...props} />);
+function renderHome(history) {
+  return render(
+    <Router history={history}>
+      <Route path="/" exact>
+        <Home />
+      </Route>
+      <Route path="/:id">
+        <div>Settings</div>
+      </Route>
+    </Router>
+  );
 }
 
+let history;
+const roomId = "41de3945-703e-40b3-b2c3-a31c2071cbc8";
+
 beforeEach(() => {
-  delete window.location;
-  // @ts-ignore
-  window.location = new URL("http://localhost/");
+  history = createMemoryHistory();
 });
 
 describe("home page", () => {
-  it("renders without crashing", () => {
-    renderApp();
-  });
-
   it("displays the Drawbotage name", () => {
-    const { queryByText } = renderApp();
-    expect(queryByText("Drawbotage")).toBeTruthy();
+    const { queryByText } = renderHome(history);
+    expect(queryByText("Drawbotage")).toBeInTheDocument();
   });
 
   it("displays a 'how to play' link", () => {
-    const { queryByText } = renderApp();
-    expect(queryByText("How to play")).toBeTruthy();
+    const { queryByRole } = renderHome(history);
+    expect(queryByRole("link", { name: "How to play" })).toBeInTheDocument();
   });
 
   it("displays the 'join game' and 'create game' options", () => {
-    const { queryByText } = renderApp();
-    expect(queryByText("Join Game")).toBeTruthy();
-    expect(queryByText("Create Game")).toBeTruthy();
+    const { queryByText } = renderHome(history);
+    expect(queryByText("Join Game")).toBeInTheDocument();
+    expect(queryByText("Create Game")).toBeInTheDocument();
   });
 
   it("underlines the 'join game' button by default", () => {
-    const { queryByText } = renderApp();
-    expect(queryByText("Join Game")).toHaveClass("active-form-button");
-    expect(queryByText("Create Game")).not.toHaveClass("active-form-button");
+    const { getByText } = renderHome(history);
+    expect(getByText("Join Game")).toHaveClass("home-form-tab--active");
+    expect(getByText("Create Game")).not.toHaveClass("home-form-tab--active");
   });
 
   it("has input fields and a button for joining a game by default", () => {
-    const { queryByPlaceholderText, getByRole } = renderApp();
-    expect(queryByPlaceholderText("Your name")).toBeTruthy();
-    expect(queryByPlaceholderText("Room ID")).toBeTruthy();
+    const { queryByPlaceholderText, getByRole } = renderHome(history);
+    expect(queryByPlaceholderText("Your name")).toBeInTheDocument();
+    expect(queryByPlaceholderText("Room ID")).toBeInTheDocument();
     expect(getByRole("button")).toHaveTextContent("Join");
   });
 
   it("underlines the 'create game' button when clicked", () => {
-    const { getByText, queryByText } = renderApp();
+    const { getByText } = renderHome(history);
     fireEvent.click(getByText("Create Game"));
-    expect(getByText("Create Game")).toHaveClass("active-form-button");
-    expect(queryByText("Join Game")).not.toHaveClass("active-form-button");
+    expect(getByText("Create Game")).toHaveClass("home-form-tab--active");
+    expect(getByText("Join Game")).not.toHaveClass("home-form-tab--active");
   });
 
   it("has input fields and a button for creating a game when 'create game' is clicked", () => {
-    const { getByText, queryByPlaceholderText, getByRole } = renderApp();
+    const { getByText, queryByPlaceholderText, getByRole } = renderHome(
+      history
+    );
     fireEvent.click(getByText("Create Game"));
-    expect(queryByPlaceholderText("Your name")).toBeTruthy();
-    expect(queryByPlaceholderText("Room name")).toBeTruthy();
+    expect(queryByPlaceholderText("Your name")).toBeInTheDocument();
+    expect(queryByPlaceholderText("Room name")).toBeInTheDocument();
     expect(getByRole("button")).toHaveTextContent("Create");
   });
 
   it("displays the same form when the corresponding button is clicked multiple times", () => {
-    const { queryByText, queryByPlaceholderText, getByRole } = renderApp();
-    const joinGameButton = queryByText("Join Game");
-    const createGameButton = queryByText("Create Game");
+    const { getByText, queryByPlaceholderText, getByRole } = renderHome(
+      history
+    );
+    const joinGameTab = getByText("Join Game");
+    const createGameTab = getByText("Create Game");
 
     for (let i = 0; i < 10; i++) {
-      fireEvent.click(joinGameButton);
-      expect(joinGameButton).toHaveClass("active-form-button");
-      expect(queryByPlaceholderText("Your name")).toBeTruthy();
-      expect(queryByPlaceholderText("Room ID")).toBeTruthy();
-      expect(queryByPlaceholderText("Room name")).toBeFalsy();
+      fireEvent.click(joinGameTab);
+      expect(joinGameTab).toHaveClass("home-form-tab--active");
+      expect(queryByPlaceholderText("Your name")).toBeInTheDocument();
+      expect(queryByPlaceholderText("Room ID")).toBeInTheDocument();
+      expect(queryByPlaceholderText("Room name")).not.toBeInTheDocument();
       expect(getByRole("button")).toHaveTextContent("Join");
     }
 
     for (let i = 0; i < 10; i++) {
-      fireEvent.click(createGameButton);
-      expect(createGameButton).toHaveClass("active-form-button");
-      expect(queryByPlaceholderText("Your name")).toBeTruthy();
-      expect(queryByPlaceholderText("Room name")).toBeTruthy();
-      expect(queryByPlaceholderText("Room ID")).toBeFalsy();
+      fireEvent.click(createGameTab);
+      expect(createGameTab).toHaveClass("home-form-tab--active");
+      expect(queryByPlaceholderText("Your name")).toBeInTheDocument();
+      expect(queryByPlaceholderText("Room name")).toBeInTheDocument();
+      expect(queryByPlaceholderText("Room ID")).not.toBeInTheDocument();
       expect(getByRole("button")).toHaveTextContent("Create");
     }
   });
 
   it("correctly toggles back and forth between the 'join game' and 'create game' forms", () => {
-    const { queryByText, queryByPlaceholderText, getByRole } = renderApp();
-    const joinGameButton = queryByText("Join Game");
-    const createGameButton = queryByText("Create Game");
+    const { queryByText, queryByPlaceholderText, getByRole } = renderHome(
+      history
+    );
+    const joinGameTab = queryByText("Join Game");
+    const createGameTab = queryByText("Create Game");
+    let currentTab = joinGameTab;
 
     for (let i = 0; i < 20; i++) {
-      const button = Math.random() < 0.5 ? joinGameButton : createGameButton;
-      const visibleText = Object.is(button, joinGameButton)
+      currentTab = Object.is(currentTab, joinGameTab)
+        ? createGameTab
+        : joinGameTab;
+      const visibleText = Object.is(currentTab, joinGameTab)
         ? "Room ID"
         : "Room name";
-      const hiddenText = Object.is(button, joinGameButton)
+      const hiddenText = Object.is(currentTab, joinGameTab)
         ? "Room name"
         : "Room ID";
-      const submitButtonText = Object.is(button, joinGameButton)
+      const submitButtonText = Object.is(currentTab, joinGameTab)
         ? "Join"
         : "Create";
 
-      fireEvent.click(button);
-      expect(button).toHaveClass("active-form-button");
-      expect(queryByPlaceholderText("Your name")).toBeTruthy();
-      expect(queryByPlaceholderText(visibleText)).toBeTruthy();
-      expect(queryByPlaceholderText(hiddenText)).toBeFalsy();
+      fireEvent.click(currentTab);
+      expect(currentTab).toHaveClass("home-form-tab--active");
+      expect(queryByPlaceholderText("Your name")).toBeInTheDocument();
+      expect(queryByPlaceholderText(visibleText)).toBeInTheDocument();
+      expect(queryByPlaceholderText(hiddenText)).not.toBeInTheDocument();
       expect(getByRole("button")).toHaveTextContent(submitButtonText);
     }
   });
 
-  it("redirects to the lobby on create", async () => {
+  it("redirects to a /:id path on create", async () => {
     const {
       getByPlaceholderText,
       getByText,
-      queryByText,
-      queryAllByText,
+      findByText,
       getByRole,
-    } = renderApp();
+    } = renderHome(history);
 
     fireEvent.click(getByText("Create Game"));
 
@@ -144,38 +149,57 @@ describe("home page", () => {
     const roomNameInput = getByPlaceholderText("Room name");
     const createButton = getByRole("button");
 
+    createRoomId.mockReturnValue(roomId);
     fireEvent.change(nameInput, { target: { value: "abc" } });
     fireEvent.change(roomNameInput, { target: { value: "123" } });
     fireEvent.submit(createButton);
 
-    await wait(() => {
-      expect(queryAllByText("Loading...").length).toBeGreaterThan(0);
-    });
-    await waitForElementToBeRemoved(() => queryAllByText("Loading...")[0]);
-    expect(queryByText("Settings")).toBeTruthy();
+    expect(await findByText("Settings")).toBeInTheDocument();
+    expect(history.location.pathname).toBe(`/${roomId}`);
   });
 
-  it("redirects to the lobby on join", async () => {
-    const {
-      getByPlaceholderText,
-      queryByText,
-      queryAllByText,
-      getByRole,
-    } = render(<App />);
+  it("redirects to a /:id path on join", async () => {
+    const { getByPlaceholderText, findByText, getByRole } = renderHome(history);
     const nameInput = getByPlaceholderText("Your name");
     const roomIdInput = getByPlaceholderText("Room ID");
     const joinButton = getByRole("button");
 
+    validateRoomId.mockReturnValue(true);
+    validatePlayerName.mockReturnValue(true);
     fireEvent.change(nameInput, { target: { value: "abc" } });
     fireEvent.change(roomIdInput, {
-      target: { value: "41de3945-703e-40b3-b2c3-a31c2071cbc8" },
+      target: { value: roomId },
     });
     fireEvent.submit(joinButton);
 
-    await wait(() => {
-      expect(queryAllByText("Loading...").length).toBeGreaterThan(0);
+    expect(await findByText("Settings")).toBeInTheDocument();
+    expect(history.location.pathname).toBe(`/${roomId}`);
+  });
+
+  it("displays an error on an unsuccessful create", async () => {
+    const {
+      getByPlaceholderText,
+      getByText,
+      getByRole,
+      findByRole,
+    } = renderHome(history);
+
+    fireEvent.click(getByText("Create Game"));
+
+    const nameInput = getByPlaceholderText("Your name");
+    const roomNameInput = getByPlaceholderText("Room name");
+    const createButton = getByRole("button");
+
+    createRoomId.mockImplementation(() => {
+      throw new Error();
     });
-    await waitForElementToBeRemoved(() => queryAllByText("Loading...")[0]);
-    expect(queryByText("Settings")).toBeTruthy();
+
+    fireEvent.change(nameInput, { target: { value: "abc" } });
+    fireEvent.change(roomNameInput, { target: { value: "123" } });
+    fireEvent.submit(createButton);
+
+    expect(await findByRole("alert")).toHaveTextContent(
+      "Unable to create room. Please try again later."
+    );
   });
 });

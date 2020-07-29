@@ -1,78 +1,64 @@
 import React from "react";
-import { Router, Route } from "react-router-dom";
 import "@testing-library/jest-dom";
 import {
   render,
   fireEvent,
   waitForElementToBeRemoved,
-  wait,
 } from "@testing-library/react";
-import { createMemoryHistory } from "history";
-import CreateForm from "../createForm";
-
-jest.mock("../../api/getRoomId", () => {
-  return jest.fn(() => "41de3945-703e-40b3-b2c3-a31c2071cbc8");
-});
+import CreateForm from "../form/createForm/createForm";
 
 function renderForm(props) {
-  const history = createMemoryHistory();
-
-  return {
-    history,
-    utils: render(
-      <Router history={history}>
-        <Route>
-          <CreateForm selected={true} {...props} />
-        </Route>
-      </Router>
-    ),
-  };
+  return render(<CreateForm {...props} />);
 }
 
 describe("create form", () => {
+  it("does not render when the 'selected' prop is not set", () => {
+    const { container: container1 } = renderForm();
+    expect(container1).toBeEmpty();
+
+    const { container: container2 } = renderForm({ isSelected: false });
+    expect(container2).toBeEmpty();
+  });
+
   it("validates the name field correctly", async () => {
-    const {
-      getByPlaceholderText,
-      findByText,
-      queryByText,
-    } = renderForm().utils;
+    const { getByPlaceholderText, findByText, queryByText } = renderForm({
+      isSelected: true,
+    });
 
     const nameInput = getByPlaceholderText("Your name");
     fireEvent.focus(nameInput);
     fireEvent.blur(nameInput);
-
-    let errorMsg = await findByText("Required");
-    expect(errorMsg).toBeTruthy();
+    expect(await findByText("Required")).toBeInTheDocument();
 
     fireEvent.change(nameInput, { target: { value: "a" } });
     await waitForElementToBeRemoved(() => queryByText("Required"));
-    expect(queryByText("Required")).toBeFalsy();
+    expect(queryByText("Required")).not.toBeInTheDocument();
 
     fireEvent.change(nameInput, { target: { value: "" } });
-    errorMsg = await findByText("Required");
-    expect(errorMsg).toBeTruthy();
+    expect(await findByText("Required")).toBeInTheDocument();
   });
 
   it("validates the room name field correctly", async () => {
-    const {
-      getByPlaceholderText,
-      findByText,
-      queryByText,
-    } = renderForm().utils;
+    const { getByPlaceholderText, findByText, queryByText } = renderForm({
+      isSelected: true,
+    });
 
     const roomIdInput = getByPlaceholderText("Room name");
     fireEvent.focus(roomIdInput);
     fireEvent.blur(roomIdInput);
-
-    let errorMsg = await findByText("Required");
-    expect(errorMsg).toBeTruthy();
+    expect(await findByText("Required")).toBeInTheDocument();
 
     fireEvent.change(roomIdInput, { target: { value: "a" } });
     await waitForElementToBeRemoved(() => queryByText("Required"));
-    expect(queryByText("Required")).toBeFalsy();
+    expect(queryByText("Required")).not.toBeInTheDocument();
 
     fireEvent.change(roomIdInput, { target: { value: "" } });
-    errorMsg = await findByText("Required");
-    expect(errorMsg).toBeTruthy();
+    expect(await findByText("Required")).toBeInTheDocument();
+  });
+
+  it("has 'Create' as the submit button text", () => {
+    const { getByRole } = renderForm({ isSelected: true });
+
+    expect(getByRole("button")).toHaveTextContent("Create");
   });
 });

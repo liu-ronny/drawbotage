@@ -5,11 +5,17 @@ import InviteLink from "./inviteLink";
 import Divider from "./divider";
 import "./settings.css";
 
-const roundOptions = [3, 5, 7];
-const drawTimeOptions = [60, 80, 100];
-
 function Settings(props) {
-  const { isHost, rounds, drawTime, onChange, onStart, onLeave } = props;
+  const {
+    isHost,
+    rounds,
+    drawTime,
+    roundOptions,
+    drawTimeOptions,
+    onChange,
+    onStart,
+    onLeave,
+  } = props;
   const [urlCopied, setUrlCopied] = useState(false);
   const url = "http://localhost:3000/" + props.roomId;
 

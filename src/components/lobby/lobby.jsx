@@ -23,6 +23,8 @@ const initialGameState = {
   rounds: 3,
   drawTime: 60,
 };
+const roundOptions = [3, 5, 7];
+const drawTimeOptions = [60, 80, 100];
 
 function Lobby(props) {
   const { playerName, roomId, joinRoom, createRoom } = props;
@@ -67,6 +69,8 @@ function Lobby(props) {
       playerName,
       roomId,
       joinRoom,
+      drawTime: game.drawTime,
+      rounds: game.rounds,
     });
     return () => connection.close();
   }, []);
@@ -99,6 +103,8 @@ function Lobby(props) {
               isHost={game.host === playerName}
               rounds={game.rounds}
               drawTime={game.drawTime}
+              roundOptions={roundOptions}
+              drawTimeOptions={drawTimeOptions}
               roomId={roomId}
               dispatch={dispatch}
               onChange={handleChange}
