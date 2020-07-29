@@ -134,63 +134,61 @@ class Canvas extends Component {
           )}
         </div>
         <div className="row no-gutters mt-3">
-          <Toolbar
-            strokeColors={this.strokeColors}
-            activeStrokeColor={this.state.strokeColor}
-            activeSizeSelection={this.state.sizeSelection}
-            activeTool={this.state.activeTool}
-            onColorOptionClick={(strokeColor) => {
-              this.canvasManager.strokeColor = strokeColor;
-              this.setState({ strokeColor });
-            }}
-            onSmallSizeClick={() => {
-              this.canvasManager.strokeWidth = this.smallStrokeWidth;
-              this.canvasManager.eraserSize = "small";
-              this.setState({ sizeSelection: "small" });
-            }}
-            onMediumSizeClick={() => {
-              this.canvasManager.strokeWidth = this.mediumStrokeWidth;
-              this.canvasManager.eraserSize = "medium";
-              this.setState({ sizeSelection: "medium" });
-            }}
-            onLargeSizeClick={() => {
-              this.canvasManager.strokeWidth = this.largeStrokeWidth;
-              this.canvasManager.eraserSize = "large";
-              this.setState({ sizeSelection: "large" });
-            }}
-            onDrawClick={() => {
-              this.canvasManager.drawingTool.activate();
-              this.setState({ activeTool: this.canvasManager.activeTool });
-            }}
-            onEraserClick={() => {
-              this.canvasManager.eraserTool.activate();
-              this.setState({ activeTool: this.canvasManager.activeTool });
-            }}
-            onClearClick={() => {
-              this.canvasManager.clearTool.clear();
-              this.setState({ activeTool: this.canvasManager.activeTool });
-            }}
-            onFillClick={() => {
-              this.canvasManager.fillTool.fill();
-              this.setState({ activeTool: this.canvasManager.activeTool });
-            }}
-            // onReverseClick={() => {
-            //   this.canvasManager.drawbotages.reverseTool.activate();
-            //   this.setState({ activeTool: this.canvasManager.activeTool });
-            // }}
-            // onHideClick={() => {
-            //   this.canvasManager.drawbotages.hideTool.activate();
-            //   this.setState({ activeTool: this.canvasManager.activeTool });
-            // }}
-            // onColorClick={() => {
-            //   this.canvasManager.drawbotages.colorTool.activate();
-            //   this.setState({ activeTool: this.canvasManager.activeTool });
-            // }}
-            // onBulldozeClick={() => {
-            //   this.canvasManager.drawbotages.bulldozeTool.activate();
-            //   this.setState({ activeTool: this.canvasManager.activeTool });
-            // }}
-          />
+          {this.props.disabled ? (
+            <Toolbar
+              strokeColors={this.strokeColors}
+              onColorOptionClick={() => {}}
+              onSmallSizeClick={() => {}}
+              onMediumSizeClick={() => {}}
+              onLargeSizeClick={() => {}}
+              onDrawClick={() => {}}
+              onEraserClick={() => {}}
+              onClearClick={() => {}}
+              onFillClick={() => {}}
+            />
+          ) : (
+            <Toolbar
+              strokeColors={this.strokeColors}
+              activeStrokeColor={this.state.strokeColor}
+              activeSizeSelection={this.state.sizeSelection}
+              activeTool={this.state.activeTool}
+              onColorOptionClick={(strokeColor) => {
+                this.canvasManager.strokeColor = strokeColor;
+                this.setState({ strokeColor });
+              }}
+              onSmallSizeClick={() => {
+                this.canvasManager.strokeWidth = this.smallStrokeWidth;
+                this.canvasManager.eraserSize = "small";
+                this.setState({ sizeSelection: "small" });
+              }}
+              onMediumSizeClick={() => {
+                this.canvasManager.strokeWidth = this.mediumStrokeWidth;
+                this.canvasManager.eraserSize = "medium";
+                this.setState({ sizeSelection: "medium" });
+              }}
+              onLargeSizeClick={() => {
+                this.canvasManager.strokeWidth = this.largeStrokeWidth;
+                this.canvasManager.eraserSize = "large";
+                this.setState({ sizeSelection: "large" });
+              }}
+              onDrawClick={() => {
+                this.canvasManager.drawingTool.activate();
+                this.setState({ activeTool: this.canvasManager.activeTool });
+              }}
+              onEraserClick={() => {
+                this.canvasManager.eraserTool.activate();
+                this.setState({ activeTool: this.canvasManager.activeTool });
+              }}
+              onClearClick={() => {
+                this.canvasManager.clearTool.clear();
+                this.setState({ activeTool: this.canvasManager.activeTool });
+              }}
+              onFillClick={() => {
+                this.canvasManager.fillTool.fill();
+                this.setState({ activeTool: this.canvasManager.activeTool });
+              }}
+            />
+          )}
         </div>
       </div>
     );

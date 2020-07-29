@@ -9,7 +9,7 @@ class Team extends Component {
     return (
       <div className={className + " col-12"}>
         <SectionHeader
-          text={this.props.teamName}
+          text={this.props.teamName + " - " + this.props.score}
           iconClassName={this.props.iconClassName}
           className={className ? className + "-header" : ""}
         />

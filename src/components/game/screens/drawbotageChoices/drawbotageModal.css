@@ -9,3 +9,15 @@
 .game-drawbotage-modal-title {
   font-weight: 700;
 }
+
+.game-drawbotage-modal-team-name {
+  text-transform: capitalize;
+}
+
+.game-drawbotage-modal-team1-color {
+  color: #5499c7;
+}
+
+.game-drawbotage-modal-team2-color {
+  color: #52be80;
+}

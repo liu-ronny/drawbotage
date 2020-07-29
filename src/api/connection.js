@@ -101,6 +101,26 @@ class Connection {
       dispatch(data);
     });
 
+    this.socket.on("guessTimer", (data) => {
+      data.type = "GUESS_TIMER";
+      dispatch(data);
+    });
+
+    this.socket.on("endTurn", (data) => {
+      data.type = "END_TURN";
+      dispatch(data);
+    });
+
+    this.socket.on("message", (data) => {
+      data.type = "RECEIVE_MESSAGE";
+      dispatch(data);
+    });
+
+    this.socket.on("endGame", (data) => {
+      data.type = "END_GAME";
+      dispatch(data);
+    });
+
     const { joinRoom, playerName, roomId, rounds, drawTime } = info;
     const event = joinRoom ? "joinGame" : "createGame";
     this.socket.emit(event, { playerName, roomId, rounds, drawTime });

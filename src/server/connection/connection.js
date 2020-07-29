@@ -144,9 +144,16 @@ class Connection {
       });
 
       socket.on("guess", (data) => {
-        if (this.checkGuess) {
-          this.checkGuess(data);
+        if (!this.rooms.has(data.roomId)) {
+          return;
         }
+
+        const room = this.rooms.get(data.roomId);
+        if (room.checkGuess) {
+          room.checkGuess(data);
+        }
+
+        socket.to(data.roomId).emit("message", { message: data });
       });
     });
   }
@@ -234,8 +241,10 @@ class Connection {
    * @param {function} check - The validator function used to check guesses
    * @param {function} callback - The function to run if a correct guess has been identified
    */
-  enableGuesses(check, callback) {
-    this.checkGuess = (data) => {
+  enableGuesses(roomId, check, callback) {
+    const room = this.rooms.get(roomId);
+
+    room.checkGuess = (data) => {
       const { guess, playerName, fromTeam, timeRemaining } = data;
 
       const isCorrect = check(guess, fromTeam);
@@ -248,8 +257,9 @@ class Connection {
   /**
    * Closes up guesses so that guess events don't do anything.
    */
-  disableGuesses() {
-    this.checkGuess = null;
+  disableGuesses(roomId) {
+    const room = this.rooms.get(roomId);
+    room.checkGuess = null;
   }
 }
 

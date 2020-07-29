@@ -157,6 +157,7 @@ class Game {
     const [_, currentTeamScore] = this.getScores();
 
     return {
+      currentTeam: this.currentTeam,
       word: this.currentWord,
       points: result.points,
       prevScore: currentTeamScore,
@@ -228,6 +229,10 @@ class Game {
   endGame(withWinner = true) {
     if (withWinner) {
       this.connection.emit("endGame", this.roomId, {
+        redScore: this.redScore,
+        blueScore: this.blueScore,
+        redTotalDrawTime: this.redTotalDrawTime,
+        blueTotalDrawTime: this.blueTotalDrawTime,
         winner: this.getWinner(),
       });
     }
@@ -291,12 +296,10 @@ class Game {
     const selector = prevPlayers.peek();
     const socket = this.room.playerSocket(selector);
 
-    socket
-      .to(this.roomId)
-      .broadcast.emit("waitForDrawbotageSelection", {
-        selector,
-        timeRemaining: 20000,
-      });
+    socket.to(this.roomId).broadcast.emit("waitForDrawbotageSelection", {
+      selector,
+      timeRemaining: 20000,
+    });
 
     // give the player 10 seconds to select a drawbotage before selecting one at random
     let drawbotage;
@@ -405,9 +408,13 @@ class Game {
     // use the check function to validate incoming guesses
     // a correct guess will cause the promise to resolve
     const guess = new Promise((resolve, reject) => {
-      this.connection.enableGuesses(check, (playerName, timeRemaining) => {
-        resolve({ playerName, timeRemaining });
-      });
+      this.connection.enableGuesses(
+        this.roomId,
+        check,
+        (playerName, timeRemaining) => {
+          resolve({ playerName, timeRemaining });
+        }
+      );
     });
 
     // race the timer against the created promise
@@ -424,7 +431,7 @@ class Game {
     } catch (err) {
       res.timeRemaining = 0;
     } finally {
-      this.connection.disableGuesses();
+      this.connection.disableGuesses(this.roomId);
     }
 
     return res;

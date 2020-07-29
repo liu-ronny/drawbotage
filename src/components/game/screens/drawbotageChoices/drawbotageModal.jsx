@@ -57,13 +57,12 @@ function DrawbotageChoices(props) {
       backdrop="static"
       keyboard={false}
       size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
       centered
       scrollable
       dialogClassName="game-drawbotage-modal"
     >
       <Modal.Header>
-        <Modal.Title id="contained-modal-title-vcenter">
+        <Modal.Title>
           <span className="game-drawbotage-modal-title w-100">
             It's drawbotage time!
           </span>

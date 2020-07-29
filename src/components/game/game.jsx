@@ -4,9 +4,12 @@ import Teams from "./teams/teams";
 import Canvas from "../canvas/canvas";
 import Chat from "./chat/chat";
 import TurnDisplay from "./turnDisplay/turnDisplay";
+import ScoreUpdate from "./screens/scoreUpdate/scoreUpdate";
 import connection from "../../api/connection";
 import "./game.css";
 import DrawbotageModal from "./screens/drawbotageChoices/drawbotageModal";
+import GameOver from "./screens/gameOver/gameOver";
+import { Redirect } from "react-router-dom";
 
 class Game extends Component {
   componentDidMount() {
@@ -20,14 +23,45 @@ class Game extends Component {
   render() {
     const props = {
       game: {
+        playerName: "hi",
+        currentPlayerName: "bye",
         redPlayerNames: ["someone", "somewhere"],
         bluePlayerNames: ["somehow", "something"],
         drawbotageSelectionTimeRemaining: 23,
+        redScore: 0,
+        blueScore: 0,
+        messages: [],
+        messageCount: 0,
       },
     };
 
     return (
       <>
+        {props.game.gameOver ? (
+          <Redirect
+            to={{
+              pathname: "/",
+              state: {},
+            }}
+          />
+        ) : null}
+
+        <GameOver
+          endResult={{
+            redScore: 750,
+            blueScore: 850,
+            redTotalDrawTime: 320,
+            blueTotalDrawTime: 500,
+            winner: "blue",
+          }}
+        />
+
+        {props.game.endResult && <GameOver endResult={props.game.endResult} />}
+
+        {props.game.turnResult && (
+          <ScoreUpdate turnResult={props.game.turnResult} />
+        )}
+
         {props.game.selectDrawbotage && (
           <DrawbotageModal
             timeRemaining={props.game.drawbotageSelectionTimeRemaining}
@@ -52,6 +86,8 @@ class Game extends Component {
                       <Teams
                         redPlayerNames={props.game.redPlayerNames}
                         bluePlayerNames={props.game.bluePlayerNames}
+                        redScore={props.game.redScore}
+                        blueScore={props.game.blueScore}
                         unassignedPlayerNames={props.game.unassignedPlayerNames}
                         currentPlayerName={props.game.currentPlayerName}
                       />
@@ -66,7 +102,13 @@ class Game extends Component {
                       />
                     </div>
                     <div className="col-4 col-lg-3 mh-100">
-                      <Chat />
+                      <Chat
+                        game={props.game}
+                        messages={props.game.messages}
+                        disabled={
+                          props.game.playerName === props.game.currentPlayerName
+                        }
+                      />
                     </div>
                   </div>
                 </div>

@@ -19,9 +19,9 @@ function Home(props) {
   const location = useLocation();
   const fromWindowUnload = location.state && location.state.fromWindowUnload;
 
-  if (fromWindowUnload) {
-    window.sessionStorage.removeItem("windowUnload");
-  }
+  // if (fromWindowUnload) {
+  window.sessionStorage.removeItem("windowUnload");
+  // }
 
   function handleJoin(values) {
     const { roomId, name } = values;
