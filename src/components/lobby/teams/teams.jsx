@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Dragula from "react-dragula";
 import TeamBox from "./teamBox";
+import Error from "../../general/error/error";
 import "./teams.css";
 
 class Teams extends Component {
@@ -29,16 +30,17 @@ class Teams extends Component {
       <div className="whiteboard p-4 pl-5">
         <div className="d-flex text-primary teams-header font-weight-bold align-items-center">
           <div>Teams</div>
-          {this.props.error ? (
-            <div
-              className="error-alert alert alert-primary text-center flex-grow-1 ml-3 mb-0"
-              role="alert"
-              onClick={this.props.onErrorClose}
-            >
-              <i class="fas fa-exclamation-circle mr-2"></i>
-              There must be at least 2 players on each team before the game can
-              start.
-            </div>
+          {this.props.playerCountError ? (
+            <Error
+              text="There must be at least 2 players on each team before the game can start."
+              onClick={this.props.onPlayerCountErrorClose}
+            />
+          ) : null}
+          {this.props.unassignedPlayerError ? (
+            <Error
+              text="All players must be assigned to a team before the game can start."
+              onClick={this.props.onUnassignedPlayerErrorClose}
+            />
           ) : null}
         </div>
         <div className="row team-boxes mt-5">

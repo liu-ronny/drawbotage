@@ -20,16 +20,16 @@ const roomId = "41de3945-703e-40b3-b2c3-a31c2071cbc8";
 describe("join form", () => {
   it("does not render when the 'selected' prop is not set", () => {
     const { container: container1 } = renderForm();
-    expect(container1).toBeEmpty();
+    expect(container1).toBeEmptyDOMElement();
 
     const { container: container2 } = renderForm({ isSelected: false });
-    expect(container2).toBeEmpty();
+    expect(container2).toBeEmptyDOMElement();
 
     const { container: container3 } = renderForm({ isSelected: false, roomId });
-    expect(container3).toBeEmpty();
+    expect(container3).toBeEmptyDOMElement();
 
     const { container: container4 } = renderForm({ roomId });
-    expect(container4).toBeEmpty();
+    expect(container4).toBeEmptyDOMElement();
   });
 
   it("validates the name field correctly", async () => {

@@ -44,9 +44,8 @@ class Connection {
     });
 
     this.socket.on("startGame", (data) => {
-      data.type = "UPDATE_GAME_INFO";
+      data.type = "START_GAME";
       dispatch(data);
-      dispatch({ type: "START_GAME" });
     });
 
     this.socket.on("setCurrentPlayer", (data) => {

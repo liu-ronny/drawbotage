@@ -6,6 +6,7 @@ class PlayerName extends Component {
   render() {
     const className = classNames("game-player-name", "pt-2", {
       [this.props.currentPlayerClassName]: this.props.isCurrentPlayer,
+      "game-current-player": this.props.isCurrentPlayer,
     });
 
     return <div className={className}>{this.props.name}</div>;

@@ -25,7 +25,7 @@ Object.defineProperty(navigator, "clipboard", {
   },
 });
 jest.mock("../../game/game", () => {
-  return <div>Game mock</div>;
+  return () => <div>Game mock</div>;
 });
 
 function renderLobby(history, props) {
@@ -33,9 +33,7 @@ function renderLobby(history, props) {
 
   return render(
     <Router history={history}>
-      <Route path="/" exact>
-        <Home />
-      </Route>
+      <Route path="/" exact component={Home} />
       <Route path="/:id">
         <Lobby {...props} />
       </Route>
@@ -158,11 +156,11 @@ describe("lobby page", () => {
 
     const selects = getAllByRole("combobox");
     for (const select of selects) {
-      expect(select).toHaveAttribute("disabled");
+      expect(select).toBeDisabled();
     }
   });
 
-  it("redirects players to the home page when they click the 'leave' button", async () => {
+  it("redirects players to the home page when they click the 'Leave' button", async () => {
     const { getByRole, findByText } = renderLobby(history, {
       playerName,
       roomId,
@@ -180,5 +178,35 @@ describe("lobby page", () => {
     expect(history.location.pathname).toBe("/");
     expect(history.location.state).toBeFalsy();
     expect(history.length).toBe(1);
+  });
+
+  it("does not allow the game to start when there are less than 2 players on each team", async () => {
+    const { getByRole, findByRole } = renderLobby(history, {
+      playerName,
+      roomId,
+      joinRoom,
+      createRoom,
+    });
+    fireEvent.click(getByRole("button", { name: "Start game" }));
+    expect(emitMock).not.toHaveBeenCalled();
+
+    expect(
+      await findByRole("alert", {
+        name:
+          "There must be at least 2 players on each team before the game can start.",
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("does not display a 'Start game' button for non-hosts", async () => {
+    const { queryByRole } = renderLobby(history, {
+      playerName,
+      roomId,
+      joinRoom: true,
+      createRoom: false,
+    });
+    expect(
+      queryByRole("button", { name: "Start game" })
+    ).not.toBeInTheDocument();
   });
 });

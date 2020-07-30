@@ -14,10 +14,10 @@ function renderForm(props) {
 describe("create form", () => {
   it("does not render when the 'selected' prop is not set", () => {
     const { container: container1 } = renderForm();
-    expect(container1).toBeEmpty();
+    expect(container1).toBeEmptyDOMElement();
 
     const { container: container2 } = renderForm({ isSelected: false });
-    expect(container2).toBeEmpty();
+    expect(container2).toBeEmptyDOMElement();
   });
 
   it("validates the name field correctly", async () => {

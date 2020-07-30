@@ -9,7 +9,7 @@ class Teams extends Component {
         <div className="row h-50">
           <Team
             className="game-team-1"
-            teamName="Team1"
+            teamName="Team 1"
             iconClassName="fas fa-pencil-ruler"
             score={this.props.redScore}
             playerNames={this.props.redPlayerNames}
@@ -20,7 +20,7 @@ class Teams extends Component {
         <div className="row h-50">
           <Team
             className="game-team-2"
-            teamName="Team2"
+            teamName="Team 2"
             iconClassName="fas fa-drafting-compass"
             score={this.props.blueScore}
             playerNames={this.props.bluePlayerNames}

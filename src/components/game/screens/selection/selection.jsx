@@ -4,13 +4,13 @@ import LoadingScreen from "../loadingScreen/loadingScreen";
 function Selection(props) {
   return (
     <LoadingScreen
-      timeRemaining={props.timeRemaining || null}
+      timeRemaining={props.timeRemaining}
       justify="center"
       displaySpinner={true}
       flexColumn={true}
       marginTop="2"
     >
-      <p>
+      <p role="alert" aria-label="Waiting for word selection">
         Waiting for{" "}
         <span className="game-loading-screen-message--highlight">
           {props.selector}

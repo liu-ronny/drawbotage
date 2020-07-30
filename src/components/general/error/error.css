@@ -1,0 +1,14 @@
+.error-alert {
+  position: relative;
+  cursor: pointer;
+}
+
+.error-alert::after {
+  position: absolute;
+  top: 0;
+  right: 0.625rem;
+  content: "x";
+  transform: translateX(50%);
+  font-weight: bold;
+  cursor: pointer;
+}

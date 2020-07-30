@@ -20,6 +20,12 @@ function gameStateReducer(state, action) {
       break;
     }
     case "START_GAME": {
+      newState.host = action.host;
+      newState.bluePlayerNames = action.bluePlayerNames;
+      newState.redPlayerNames = action.redPlayerNames;
+      newState.unassignedPlayerNames = action.unassignedPlayerNames;
+      newState.rounds = action.rounds;
+      newState.drawTime = action.drawTime;
       newState.start = true;
       break;
     }
@@ -99,7 +105,7 @@ function gameStateReducer(state, action) {
       break;
     }
     case "GUESS_TIMER": {
-      newState.turnTimeRemaining = action.timeRemaining;
+      newState.turnTimeRemaining = action.timeRemaining / 1000;
       break;
     }
     case "END_TURN": {

@@ -6,6 +6,7 @@ import Teams from "./teams/teams";
 import Game from "../game/game";
 import gameStateReducer from "./gameStateReducer";
 import connection from "../../api/connection";
+
 import "./lobby.css";
 
 const initialGameState = {
@@ -31,7 +32,8 @@ function Lobby(props) {
   initialGameState.host = createRoom ? playerName : "";
   initialGameState.playerName = playerName;
   const [game, dispatch] = useReducer(gameStateReducer, initialGameState);
-  const [error, setError] = useState(false);
+  const [playerCountError, setPlayerCountError] = useState(false);
+  const [unassignedPlayerError, setUnassignedPlayerError] = useState(false);
 
   const handleChange = (event, settingName) => {
     connection.emit("updateSettings", {
@@ -42,7 +44,14 @@ function Lobby(props) {
   };
   const handleStart = () => {
     if (game.bluePlayerNames.length < 2 || game.redPlayerNames.length < 2) {
-      setError(true);
+      setPlayerCountError(true);
+      setUnassignedPlayerError(false);
+      return;
+    }
+
+    if (game.unassignedPlayerNames.length > 0) {
+      setUnassignedPlayerError(true);
+      setPlayerCountError(false);
       return;
     }
 
@@ -52,7 +61,9 @@ function Lobby(props) {
   const handleLeave = () =>
     connection.emit("leaveGame", { roomId, playerName });
 
-  const handleErrorClose = () => setError(false);
+  const handlePlayerCountErrorClose = () => setPlayerCountError(false);
+  const handleUnassignedPlayerErrorClose = () =>
+    setUnassignedPlayerError(false);
 
   const updateTeams = (team, index, name) => {
     connection.emit("updateTeams", {
@@ -121,8 +132,10 @@ function Lobby(props) {
               unassignedPlayerNames={game.unassignedPlayerNames}
               updateTeams={updateTeams}
               displayPlayerTags={game.displayPlayerTags}
-              error={error}
-              onErrorClose={handleErrorClose}
+              playerCountError={playerCountError}
+              unassignedPlayerError={unassignedPlayerError}
+              onPlayerCountErrorClose={handlePlayerCountErrorClose}
+              onUnassignedPlayerErrorClose={handleUnassignedPlayerErrorClose}
             />
           </div>
         </div>

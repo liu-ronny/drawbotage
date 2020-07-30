@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Redirect, useLocation, Link } from "react-router-dom";
+import { Redirect, useLocation, useHistory, Link } from "react-router-dom";
 import Header from "../general/header/header";
 import Alert from "../general/alert/alert";
 import Form from "./form/form";
@@ -16,9 +16,8 @@ function Home(props) {
   });
   const [createRoomError, setCreateRoomError] = useState(false);
   const location = useLocation();
+  const history = useHistory();
   const fromWindowUnload = location.state && location.state.fromWindowUnload;
-
-  window.sessionStorage.removeItem("windowUnload");
 
   function handleJoin(values) {
     const { roomId, name } = values;
@@ -61,6 +60,13 @@ function Home(props) {
 
     for (let i in body) {
       document.body.style[i] = body[i];
+    }
+  }, []);
+
+  useEffect(() => {
+    if (fromWindowUnload) {
+      window.sessionStorage.removeItem("windowUnload");
+      window.history.replaceState(null, "");
     }
   }, []);
 

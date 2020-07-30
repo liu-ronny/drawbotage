@@ -3,7 +3,11 @@ import "./alert.css";
 
 function Alert(props) {
   return (
-    <div className="alert alert-primary text-center mt-2" role="alert">
+    <div
+      className="alert alert-primary text-center mt-2"
+      role="alert"
+      aria-label={props.message}
+    >
       {props.message}
     </div>
   );

@@ -16,21 +16,32 @@ function LoadingScreen(props) {
     }
   );
 
-  console.log(props);
+  const displayTimer = !isNaN(parseInt(props.timeRemaining));
 
   return (
     <div className="game-loading-screen-container">
       <div className={className}>
         {props.children}
         {props.displaySpinner && (
-          <div class="spinner">
-            <div class="bounce1" />
-            <div class="bounce2" />
-            <div class="bounce3" />
+          <div
+            className="spinner"
+            role="alert"
+            aria-busy="true"
+            aria-label="Waiting..."
+          >
+            <div className="bounce1" />
+            <div className="bounce2" />
+            <div className="bounce3" />
           </div>
         )}
-        {props.timeRemaining && (
-          <div className={"mt-" + props.marginTop}>{props.timeRemaining}s</div>
+        {displayTimer && (
+          <div
+            className={"mt-" + props.marginTop}
+            role="alert"
+            aria-label="wait time remaining"
+          >
+            {props.timeRemaining}s
+          </div>
         )}
       </div>
     </div>
