@@ -7,7 +7,7 @@
   left: 0;
   height: calc(100% + 8px);
   width: calc(100% + 8px);
-  z-index: 9999;
+  z-index: 10;
   background-color: rgba(240, 248, 255, 0.35);
   pointer-events: none;
   font-size: 2rem;

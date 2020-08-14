@@ -1,15 +1,21 @@
 const Connection = require("../../connection/connection");
 const MockSocket = require("socket.io-mock");
 
+const roomId = "41de3945-703e-40b3-b2c3-a31c2071cbc8";
 const drawbotages = ["reverse", "hide", "color", "bulldoze"];
-// in ms
 const drawTime = 60000;
+const waitTime = 20000;
 
 let connection;
 let room;
 let game;
 let mockServer;
 let assertionCount;
+
+jest.mock("../../../utils/promises.js", () => ({
+  ...jest.requireActual("../../../utils/promises.js"),
+  waitPromise: () => {},
+}));
 
 // MockSocket.prototype.to = function (roomKey) {
 //   return {
@@ -89,7 +95,7 @@ beforeEach(() => {
     }
   }
 
-  room = connection.get("41de3945-703e-40b3-b2c3-a31c2071cbc8");
+  room = connection.get(roomId);
   room.createGame();
   game = room.game;
 });
@@ -102,7 +108,7 @@ afterEach(() => {
 function emitToServer(event, data) {
   const { playerName, pushTo } = data;
   const defaults = {
-    roomId: "41de3945-703e-40b3-b2c3-a31c2071cbc8",
+    roomId,
     rounds: 3,
     drawTime: 60,
   };
@@ -122,17 +128,37 @@ function emitToServer(event, data) {
 
 describe("Game", () => {
   it("sets the next team correctly", () => {
-    let currentTeam = game.currentTeam === "blue" ? "blue" : "red";
-    let nextTeam = game.currentTeam === "blue" ? "red" : "blue";
+    let prevTeam = game.prevTeam;
+    let currentTeam = game.currentTeam;
 
     for (let i = 0; i < 50; i++) {
       game.setNextTeam();
 
       // verify that the teams have swapped roles
-      expect(game.currentTeam).toBe(nextTeam);
+      expect(game.currentTeam).toBe(prevTeam);
 
       // swap the team variables for the next check
-      [currentTeam, nextTeam] = [nextTeam, currentTeam];
+      [currentTeam, prevTeam] = [prevTeam, currentTeam];
+    }
+  });
+
+  it("sets the next player correctly", () => {
+    const playerNames = {
+      blue: ["p2", "p4", "p6", "p8", "p10"],
+      red: ["p1", "p3", "p5", "p7", "p9"],
+    };
+
+    for (let i = 0; i < 50; i++) {
+      for (let j = 0; j < 50; j++) {
+        game.setNextPlayer();
+        expect(playerNames[game.currentTeam].includes(game.currentPlayer)).toBe(
+          true
+        );
+        expect(
+          playerNames[game.prevTeam].includes(game.currentPlayer)
+        ).not.toBe(true);
+      }
+      game.setNextTeam();
     }
   });
 
@@ -147,13 +173,17 @@ describe("Game", () => {
     // check that the emitted choices match the drawbotages array
     let drawbotage;
     mockServer.socketClient.on("selectDrawbotage", (data) => {
-      const { data: drawbotageChoices, respond } = data;
+      const {
+        data: { drawbotages: choices, timeRemaining },
+        respond,
+      } = data;
 
-      expect(drawbotageChoices).toEqual(drawbotages);
-      drawbotage = drawbotageChoices[0];
+      expect(choices).toEqual(drawbotages);
+      expect(timeRemaining).toBe(waitTime);
+      drawbotage = choices[0];
       respond(drawbotage);
     });
-    assertionCount++;
+    assertionCount += 2;
 
     // check that the emitted selection matches the choice made
     mockServer.onEmit("drawbotageSelection", (data) => {
@@ -161,24 +191,32 @@ describe("Game", () => {
     });
     assertionCount++;
 
-    // check that the return value is the selected drawbotage
+    // check that a signal to hide the selection is sent
+    mockServer.onEmit("hideDrawbotageSelection", (data) => {
+      expect(true).toBe(true);
+    });
     assertionCount++;
+
+    // check that the return value is the selected drawbotage
     try {
       const selection = await game.selectDrawbotage();
       expect(selection).toBe(drawbotage);
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
+    assertionCount++;
 
     expect.assertions(assertionCount);
   });
 
   it("selects a random drawbotage if the player fails to respond in time", async () => {
-    // check that a 10 second timer gets emitted
-    let timeRemaining = 10000;
+    // check that a timer gets emitted
+    let timeRemaining = waitTime;
     mockServer.onEmit("selectDrawbotageTimer", (data) => {
       expect(data.timeRemaining).toBe(timeRemaining);
       timeRemaining -= 1000;
     });
-    assertionCount += 10;
+    assertionCount += waitTime / 1000;
 
     // check that some drawbotage is selected
     let drawbotage;
@@ -195,7 +233,9 @@ describe("Game", () => {
       jest.runAllTimers();
       selection = await selection;
       expect(selection).toBe(drawbotage);
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
 
     expect.assertions(assertionCount);
   });
@@ -213,25 +253,31 @@ describe("Game", () => {
     // check that three choices are emitted to the selector
     let word;
     mockServer.socketClient.on("selectWord", (data) => {
-      const { data: words, respond } = data;
+      const {
+        data: { words, timeRemaining },
+        respond,
+      } = data;
       expect(words).toHaveLength(3);
+      expect(timeRemaining).toBe(waitTime);
       word = words[0];
       respond(word);
     });
-    assertionCount++;
+    assertionCount += 2;
 
     // check that the emitted selection matches the choice made
     mockServer.onEmit("wordSelection", (data) => {
-      expect(data.selection).toBe(word);
+      expect(data.wordLength).toBe(word.length);
     });
     assertionCount++;
 
     // check that the return value is the selected word
-    assertionCount++;
     try {
       const selection = await game.selectWord();
       expect(selection).toBe(word);
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
+    assertionCount++;
 
     expect.assertions(assertionCount);
   });
@@ -239,88 +285,146 @@ describe("Game", () => {
   it("selects a random word if the player fails to respond in time", async () => {
     game.setNextPlayer();
 
-    // check that a 10 second timer gets emitted
-    let timeRemaining = 10000;
+    // check that a timer gets emitted
+    let timeRemaining = waitTime;
     mockServer.onEmit("selectWordTimer", (data) => {
       expect(data.timeRemaining).toBe(timeRemaining);
       timeRemaining -= 1000;
     });
-    assertionCount += 10;
+    assertionCount += waitTime / 1000;
 
-    let word;
     // check that some word is selected
     mockServer.onEmit("wordSelection", (data) => {
-      expect(data.selection).toBeTruthy();
-      word = data.selection;
+      expect(data.wordLength).toBeGreaterThan(0);
     });
     assertionCount++;
 
-    // check that the return value is the selected drawbotage
-    assertionCount++;
     try {
       let selection = game.selectWord();
       jest.runAllTimers();
       selection = await selection;
-      expect(selection).toBe(word);
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
 
     expect.assertions(assertionCount);
   });
 
   it("receives guesses from players during a turn correctly", async () => {
-    room.createGame();
     game.setCurrentWord("test");
     const currentTeam = game.currentTeam;
+    const prevTeam = game.prevTeam;
 
-    const result = game.receiveGuesses();
-    mockServer.socketClient.emit("guess", {
-      playerName: "p1",
-      fromTeam: currentTeam,
-      timeRemaining: 50000,
-      guess: "best",
-    });
-    mockServer.socketClient.emit("guess", {
-      playerName: "p2",
-      fromTeam: currentTeam,
-      timeRemaining: 45000,
-      guess: "test",
-    });
+    // check that guesses received before receiveGuesses() is called are considered false
+    const guesses = ["best", "rest", "test"];
 
-    assertionCount += 2;
+    mockServer.onEmit("message", (data) => {
+      const { isCorrect } = data;
+      expect(isCorrect).toBeFalsy();
+    });
+    assertionCount += guesses.length * 2;
+
+    for (let i = 0; i < guesses.length; i++) {
+      mockServer.socketClient.emit("guess", {
+        roomId,
+        playerName: "p1",
+        fromTeam: currentTeam,
+        timeRemaining: 50000,
+        guess: guesses[i],
+      });
+
+      mockServer.socketClient.emit("guess", {
+        roomId,
+        playerName: "p1",
+        fromTeam: prevTeam,
+        timeRemaining: 50000,
+        guess: guesses[i],
+      });
+    }
+
+    // check that guesses received after receiveGuesses() is called are validated correctly
+    const result = game.receiveGuesses(60000);
+
+    mockServer.onEmit("message", (data) => {
+      const { isCorrect } = data;
+      expect(isCorrect).toBeFalsy();
+    });
+    assertionCount += guesses.length;
+
+    for (let i = 0; i < guesses.length; i++) {
+      mockServer.socketClient.emit("guess", {
+        roomId,
+        playerName: "p1",
+        fromTeam: prevTeam,
+        timeRemaining: 50000,
+        guess: guesses[i],
+      });
+    }
+
+    mockServer.onEmit("message", (data) => {
+      const { message, isCorrect } = data;
+      expect(isCorrect).toBe(message.guess === "test");
+    });
+    assertionCount += guesses.length;
+
+    for (let i = 0; i < guesses.length; i++) {
+      mockServer.socketClient.emit("guess", {
+        roomId,
+        playerName: "p1",
+        fromTeam: currentTeam,
+        timeRemaining: 50000,
+        guess: guesses[i],
+      });
+    }
+
     try {
       const res = await result;
-      expect(res.playerName).toBe("p2");
-      expect(res.timeRemaining).toBe(45000);
-    } catch (err) {}
+      expect(res.playerName).toBe("p1");
+      expect(res.timeRemaining).toBe(50000);
+    } catch (err) {
+      throw err;
+    }
+    assertionCount += 2;
 
     expect.assertions(assertionCount);
   });
 
   it("handles no correct guesses from players during a turn correctly", async () => {
-    room.createGame();
     game.setCurrentWord("test");
     const currentTeam = game.currentTeam;
+    const prevTeam = game.prevTeam;
 
     const result = game.receiveGuesses(60000);
     mockServer.socketClient.emit("guess", {
+      roomId,
       playerName: "p1",
       fromTeam: currentTeam,
       timeRemaining: 50000,
       guess: "best",
     });
     mockServer.socketClient.emit("guess", {
+      roomId,
       playerName: "p2",
       fromTeam: currentTeam,
       timeRemaining: 45000,
       guess: "rest",
     });
+    mockServer.socketClient.emit("guess", {
+      roomId,
+      playerName: "p2",
+      fromTeam: prevTeam,
+      timeRemaining: 45000,
+      guess: "test",
+    });
 
-    assertionCount++;
-    jest.runAllTimers();
     try {
+      jest.runAllTimers();
       const res = await result;
       expect(res.timeRemaining).toBe(0);
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
+    assertionCount++;
 
     expect.assertions(assertionCount);
   });
@@ -351,7 +455,86 @@ describe("Game", () => {
     expect(game.calculatePoints(drawTime * 0)).toBe(0);
   });
 
-  it("cleans up properly after the game is over", async () => {
+  it("uses an accurate validator function", () => {
+    const currentTeam = game.currentTeam;
+    const prevTeam = game.prevTeam;
+
+    game.setCurrentWord("test");
+    let check = game.createGuessChecker();
+    expect(check("test", currentTeam)).toBe(true);
+    expect(check("best", currentTeam)).toBe(false);
+    expect(check("test", prevTeam)).toBe(false);
+    expect(check("best", prevTeam)).toBe(false);
+
+    game.setNextTeam();
+    game.setCurrentWord("best");
+    check = game.createGuessChecker();
+    expect(check("best", currentTeam)).toBe(false);
+    expect(check("test", currentTeam)).toBe(false);
+    expect(check("best", prevTeam)).toBe(true);
+    expect(check("test", prevTeam)).toBe(false);
+  });
+
+  it("emits accurate results to the client when a player guesses the word", async () => {
+    game.setCurrentWord("test");
+    const currentTeam = game.currentTeam;
+
+    mockServer.onEmit("endTurn", (data) => {
+      expect(data.prevScore).toBe(0);
+      expect(data.points).toBe(100);
+      expect(data.currentScore).toBe(100);
+      expect(data.currentTeam).toBe(currentTeam);
+      expect(data.timeRemaining).toBe(50000);
+      expect(data.playerName).toBe("p1");
+    });
+    assertionCount += 6;
+
+    const result = game.receiveGuesses(60000);
+    mockServer.socketClient.emit("guess", {
+      roomId,
+      playerName: "p1",
+      fromTeam: currentTeam,
+      timeRemaining: 50000,
+      guess: "test",
+    });
+
+    try {
+      const res = await result;
+      await game.endTurn(res);
+    } catch (err) {
+      throw err;
+    }
+
+    expect.assertions(assertionCount);
+  });
+
+  it("emits accurate results to the client when no player guesses the word", async () => {
+    game.setCurrentWord("test");
+    const currentTeam = game.currentTeam;
+
+    mockServer.onEmit("endTurn", (data) => {
+      expect(data.prevScore).toBe(0);
+      expect(data.points).toBe(0);
+      expect(data.currentScore).toBe(0);
+      expect(data.timeRemaining).toBe(0);
+      expect(data.currentTeam).toBe(currentTeam);
+    });
+    assertionCount += 5;
+
+    const result = game.receiveGuesses(60000);
+
+    try {
+      jest.runAllTimers();
+      const res = await result;
+      await game.endTurn(res);
+    } catch (err) {
+      throw err;
+    }
+
+    expect.assertions(assertionCount);
+  });
+
+  it("cleans up properly after the game is over", () => {
     mockServer.onEmit("endGame", () => {
       expect(true).toBe(true);
     });

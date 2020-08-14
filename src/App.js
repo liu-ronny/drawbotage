@@ -4,7 +4,6 @@ import "./App.css";
 import Home from "./components/home/home";
 import ErrorPage from "./components/errorPage";
 import ProtectedRoute from "./components/protectedRoute";
-import Reload from "./components/general/reload/reload";
 import Game from "./components/game/game";
 
 class App extends Component {

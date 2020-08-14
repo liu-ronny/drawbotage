@@ -25,27 +25,116 @@ class Tool {
    * Returns a decorated event handler that only runs if the corresponding event
    * is fired from within the underlying canvas element. Requires the element to
    * have an HTML id of "canvas".
-   * @param {function} handler
+   * @param {Function} handler
+   * @returns {Function} The decorated handler
    */
-  _boundsChecker = (handler) => {
+  _boundsChecker(handler) {
     return (event) => {
-      if (event.event.target.id === "canvas") {
+      if (!event.event || event.event.target.id === "canvas") {
         handler(event);
       }
     };
-  };
+  }
 
   /**
-   * Turns any valid handler in a list of handler names into a bounds checker.
+   * Turns any valid handler in an array of handler names into a bounds checker.
    * @param {string[]} handlers - An array of handler names to apply bounds checking for
    */
-  _enableBoundsCheckingFor = (handlers) => {
+  _enableBoundsCheckingFor(handlers) {
     for (let handler of handlers) {
       if (this[handler]) {
         this[handler] = this._boundsChecker(this[handler]);
       }
     }
-  };
+  }
+
+  /**
+   * Turns any valid handler in an array of handler names into an emitter. Emitters
+   * are defined in child classes and must have the name '_emit_<handler name>'.
+   * @param {string[]} handlers - An array of handler names to add emitter functionality to
+   */
+  _enableEmittersFor(handlers) {
+    for (let handler of handlers) {
+      if (this[handler]) {
+        this[handler] = this["_emit_" + handler](this[handler]);
+      }
+    }
+  }
+
+  /**
+   * Caches the current bindings of the specified functions in a property called
+   * _originalFunctions.
+   * @param {string[]} fns - The names of the functions to cache
+   */
+  _preserveFunctions(fns) {
+    this._originalFunctions = {};
+
+    for (let fn of fns) {
+      if (this[fn]) {
+        this._originalFunctions[fn] = this[fn];
+      }
+    }
+  }
+
+  /**
+   * Restores any cached functions to point to their preserved references.
+   */
+  _restoreFunctions() {
+    if (this._originalFunctions) {
+      for (let [name, fn] of Object.entries(this._originalFunctions)) {
+        this[name] = fn;
+      }
+    }
+  }
+
+  /**
+   * Activates the tool. This is an empty implementation that is overrided as necessary by child classes.
+   * @interface
+   */
+  activate() {}
+
+  /**
+   * Binds the relevant functions to the corresponding Paper JS event handlers.
+   * This is an empty implementation that is overrided as necessary by child classes.
+   * This function must be implemented for enableEmitters and disableEmitters to work.
+   * @interface
+   */
+  _bindHandlers() {}
+
+  /**
+   * Turns all cached functions in the tool into emitters and re-binds
+   * the decorated functions to their corresponding tool event handlers.
+   * @param {boolean} [checkBounds] - Whether to enable bounds checking for the functions - true by default
+   */
+  enableEmitters(checkBounds = true) {
+    const funcs = Object.keys(this._originalFunctions);
+
+    this._restoreFunctions();
+    this._enableEmittersFor(funcs);
+
+    if (checkBounds) {
+      this._enableBoundsCheckingFor(funcs);
+    }
+
+    this._bindHandlers();
+  }
+
+  /**
+   * Reverts any emitter decorations made to all cached functions in the tool
+   * and re-binds the decorated functions to their corresponding tool event handlers.
+   * @param {boolean} [checkBounds] - Whether to enable bounds checking for the functions - true by default
+   */
+  disableEmitters(checkBounds = true) {
+    const funcs = Object.keys(this._originalFunctions);
+
+    this._restoreFunctions();
+
+    if (checkBounds) {
+      this._enableBoundsCheckingFor(funcs);
+    }
+
+    this._bindHandlers();
+  }
 
   /**
    * Specifies properties for the current path.
@@ -65,12 +154,6 @@ class Tool {
       this.paths.push(this.path);
     }
   };
-
-  /**
-   * Activates the tool. This is an empty implementation that is overrided as necessary by child classes.
-   * @interface
-   */
-  activate = () => {};
 }
 
 export default Tool;

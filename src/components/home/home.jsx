@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Redirect, useLocation, useHistory, Link } from "react-router-dom";
+import { Redirect, useLocation, Link } from "react-router-dom";
 import Header from "../general/header/header";
 import Alert from "../general/alert/alert";
 import Form from "./form/form";
@@ -16,7 +16,6 @@ function Home(props) {
   });
   const [createRoomError, setCreateRoomError] = useState(false);
   const location = useLocation();
-  const history = useHistory();
   const fromWindowUnload = location.state && location.state.fromWindowUnload;
 
   function handleJoin(values) {

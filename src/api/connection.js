@@ -10,16 +10,11 @@ class Connection {
   }
 
   open() {
-    if (!this.socket) {
-      this.socket = io("http://localhost:8080");
-    }
+    this.socket = io("http://localhost:8080");
   }
 
   close() {
-    if (this.socket) {
-      this.socket.close();
-    }
-
+    this.socket.close();
     this.socket = null;
   }
 
@@ -45,6 +40,16 @@ class Connection {
 
     this.socket.on("startGame", (data) => {
       data.type = "START_GAME";
+      dispatch(data);
+    });
+
+    this.socket.on("gameStarting", (data) => {
+      data.type = "GAME_STARTING";
+      dispatch(data);
+    });
+
+    this.socket.on("startGameplay", (data) => {
+      data.type = "START_GAMEPLAY";
       dispatch(data);
     });
 
@@ -100,6 +105,12 @@ class Connection {
       dispatch(data);
     });
 
+    this.socket.on("hideDrawbotageSelection", (data) => {
+      dispatch({
+        type: "HIDE_DRAWBOTAGE_SELECTION",
+      });
+    });
+
     this.socket.on("guessTimer", (data) => {
       data.type = "GUESS_TIMER";
       dispatch(data);
@@ -108,6 +119,12 @@ class Connection {
     this.socket.on("endTurn", (data) => {
       data.type = "END_TURN";
       dispatch(data);
+    });
+
+    this.socket.on("hideTurnResult", (data) => {
+      dispatch({
+        type: "SCORE_UPDATE_VIEWED",
+      });
     });
 
     this.socket.on("message", (data) => {
@@ -124,6 +141,65 @@ class Connection {
     const event = joinRoom ? "joinGame" : "createGame";
     this.socket.emit(event, { playerName, roomId, rounds, drawTime });
   }
+
+  attachCanvas(canvasComponent) {
+    this.canvas = canvasComponent;
+
+    this.socket.on("setColor", (data) => {
+      const canvasManager = this.canvas.canvasManager;
+      canvasManager.strokeColor = data.strokeColor;
+    });
+
+    // this.socket.on("setSize", (data) => {
+    //   this.canvas.setState({ sizeSelection: data.size });
+    // });
+
+    this.socket.on("drawingTool", this._applyDrawEvent("drawingTool"));
+
+    this.socket.on("eraserTool", (data) => {
+      const { functionName, relativePoint, relativeEraserSize } = data;
+      const canvasManager = this.canvas.canvasManager;
+      const event = { point: canvasManager.getAbsolutePoint(relativePoint) };
+      const eraserSize = canvasManager.getAbsoluteEraserSize(
+        relativeEraserSize
+      );
+
+      canvasManager.eraseLayer.activate();
+      if (functionName === "_erase") {
+        canvasManager.eraserTool.erase(event, eraserSize);
+      } else if (functionName === "rasterizeAfterErase") {
+        canvasManager.eraserTool[functionName](event, false);
+      }
+    });
+
+    this.socket.on("clearTool", () => {
+      this.canvas.canvasManager.clearTool.clear();
+    });
+
+    this.socket.on("fillTool", () => {
+      this.canvas.canvasManager.fillTool.fill();
+    });
+
+    this.socket.on("reverseTool", this._applyDrawEvent("reverseTool"));
+    this.socket.on("colorTool", this._applyDrawEvent("colorTool"));
+    this.socket.on("hideTool", this._applyDrawEvent("hideTool"));
+  }
+
+  _applyDrawEvent = (toolName) => {
+    return (data) => {
+      const { functionName, relativePoint, relativeStrokeWidth } = data;
+      const canvasManager = this.canvas.canvasManager;
+
+      canvasManager.drawLayer.activate();
+      canvasManager.strokeWidth = canvasManager.getAbsoluteStrokeWidth(
+        relativeStrokeWidth
+      );
+
+      canvasManager[toolName][functionName]({
+        point: canvasManager.getAbsolutePoint(relativePoint),
+      });
+    };
+  };
 
   /**
    * Emits an event to the server socket.

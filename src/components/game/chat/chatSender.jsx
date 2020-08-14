@@ -25,6 +25,8 @@ class ChatSender extends Component {
               input.value = "";
             }
           }}
+          role="button"
+          aria-label="Send message"
         >
           <i className="far fa-paper-plane"></i>
         </div>

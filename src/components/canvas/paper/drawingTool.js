@@ -1,4 +1,5 @@
 import Tool from "./tool";
+import connection from "../../../api/connection";
 
 /**
  * A tool that allows the user to draw in the specified PaperScope.
@@ -12,10 +13,25 @@ class DrawingTool extends Tool {
   constructor(paper, canvasManager) {
     super(paper, canvasManager);
 
-    this._enableBoundsCheckingFor(["_draw", "_addPoint"]);
-    this.tool.onMouseDown = this._draw;
-    this.tool.onMouseDrag = this._addPoint;
-    this.tool.onMouseUp = this._recordPath;
+    const fnNames = ["_draw", "_addPoint", "_recordPath"];
+    this._preserveFunctions(fnNames);
+
+    this._enableBoundsCheckingFor(fnNames.slice(0, 2));
+    this._bindHandlers();
+
+    for (let name of fnNames) {
+      this["_emit_" + name] = (handler) => {
+        return (event) => {
+          handler(event);
+
+          connection.emit("drawingTool", {
+            functionName: name,
+            relativePoint: this.canvasManager.getRelativePoint(event.point),
+            relativeStrokeWidth: this.canvasManager.getRelativeStrokeWidth(),
+          });
+        };
+      };
+    }
   }
 
   /**
@@ -37,15 +53,26 @@ class DrawingTool extends Tool {
   };
 
   /**
+   * Binds the current event handlers to their corresponding tool event handler
+   * references.
+   * @override
+   */
+  _bindHandlers() {
+    this.tool.onMouseDown = this._draw;
+    this.tool.onMouseDrag = this._addPoint;
+    this.tool.onMouseUp = this._recordPath;
+  }
+
+  /**
    * Activates the corresponding Tool in the current PaperScope. Ensures that
    * new paths are added to the draw layer.
    * @override
    */
-  activate = () => {
+  activate() {
     this.tool.activate();
     this.canvasManager.activeTool = "drawing";
     this.canvasManager.drawLayer.activate();
-  };
+  }
 }
 
 export default DrawingTool;

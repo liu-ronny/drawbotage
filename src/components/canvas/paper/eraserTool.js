@@ -1,4 +1,5 @@
 import Tool from "./tool";
+import connection from "../../../api/connection";
 
 /**
  * A tool that allows the user to erase in the specified PaperScope.
@@ -21,12 +22,40 @@ class EraserTool extends Tool {
     this.symbolCount = 0;
     this.maxSymbolCount = 200;
     this.currentOutline = null;
-
     this.symbols = this._createEraserSymbols(eraserSizes);
     this.eraserOutlineSymbol = this.symbols.smallEraserSizeOutlineSymbol;
     this.eraserSymbol = this.symbols.smallEraserSizeSymbol;
 
+    const fnNames = ["_erase", "rasterizeAfterErase"];
+    this._preserveFunctions(fnNames);
+
     this._enableBoundsCheckingFor(["_placeOutline", "_erase"]);
+    this._bindHandlers();
+
+    for (let name of fnNames) {
+      this["_emit_" + name] = (handler) => {
+        return (event) => {
+          handler(event);
+
+          const bounds = this.eraserSymbol.item.bounds;
+          connection.emit("eraserTool", {
+            functionName: name,
+            relativePoint: this.canvasManager.getRelativePoint(event.point),
+            relativeEraserSize: this.canvasManager.getRelativeEraserSize(
+              bounds
+            ),
+          });
+        };
+      };
+    }
+  }
+
+  /**
+   * Binds the current event handlers to their corresponding tool event handler
+   * references.
+   * @override
+   */
+  _bindHandlers() {
     this.tool.onMouseMove = this._displayEraser;
     this.tool.onMouseDown = this._erase;
     this.tool.onMouseDrag = this._erase;
@@ -132,6 +161,7 @@ class EraserTool extends Tool {
     this._removeOutline();
 
     const raster = eraseLayer.rasterize();
+    raster.smoothing = false;
     eraseLayer.removeChildren();
     drawLayer.addChild(raster);
 
@@ -139,6 +169,27 @@ class EraserTool extends Tool {
       this._displayEraser(event);
     }
   };
+
+  /**
+   * Draws an eraser path given a relative width and length.
+   * @param {object} event - An object that contains a point property containing the coordinates to erase at
+   * @param {object} eraserSize - An object that contains the width and length of the eraser
+   */
+  erase(event, eraserSize) {
+    const eraserPath = new this.paper.Path.Rectangle({
+      center: [event.point.x, event.point.y],
+      size: [eraserSize.width, eraserSize.height],
+      strokeColor: "#FFFFFF",
+      fillColor: "#FFFFFF",
+    });
+
+    this.symbolCount++;
+
+    if (this.symbolCount > this.maxSymbolCount) {
+      this.rasterizeAfterErase(event, false);
+      this.symbolCount = 0;
+    }
+  }
 
   /**
    * Activates the corresponding Tool in the current PaperScope. Ensures that

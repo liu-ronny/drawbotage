@@ -1,4 +1,5 @@
 import Tool from "../tool";
+import connection from "../../../../api/connection";
 
 /**
  * A tool that draws paths using random colors in the specified PaperScope.
@@ -12,7 +13,28 @@ class ColorTool extends Tool {
   constructor(paper, canvasManager) {
     super(paper, canvasManager);
 
-    this._enableBoundsCheckingFor(["_draw", "_addPoint"]);
+    const fnNames = ["_draw", "_addPoint", "_recordPath"];
+    this._preserveFunctions(fnNames);
+
+    this._enableBoundsCheckingFor(fnNames.slice(0, 2));
+    this._bindHandlers();
+
+    for (let name of fnNames) {
+      this["_emit_" + name] = (handler) => {
+        return (event) => {
+          handler(event);
+
+          connection.emit("colorTool", {
+            functionName: name,
+            relativePoint: this.canvasManager.getRelativePoint(event.point),
+            relativeStrokeWidth: this.canvasManager.getRelativeStrokeWidth(),
+          });
+        };
+      };
+    }
+  }
+
+  _bindHandlers() {
     this.tool.onMouseDown = this._draw;
     this.tool.onMouseDrag = this._addPoint;
     this.tool.onMouseUp = this._recordPath;

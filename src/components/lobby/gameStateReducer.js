@@ -1,5 +1,3 @@
-import connection from "../../api/connection";
-
 function gameStateReducer(state, action) {
   const newState = {};
   Object.assign(newState, state);
@@ -27,6 +25,14 @@ function gameStateReducer(state, action) {
       newState.rounds = action.rounds;
       newState.drawTime = action.drawTime;
       newState.start = true;
+      break;
+    }
+    case "GAME_STARTING": {
+      newState.gameStarting = true;
+      break;
+    }
+    case "START_GAMEPLAY": {
+      newState.gameStarting = false;
       break;
     }
     case "SET_CURRENT_PLAYER": {
@@ -86,7 +92,7 @@ function gameStateReducer(state, action) {
     case "DRAWBOTAGE_SELECTED": {
       newState.selectDrawbotage = false;
 
-      if (newState.respondWithWord) {
+      if (newState.respondWithDrawbotage) {
         newState.respondWithDrawbotage(action.drawbotage);
         newState.respondWithDrawbotage = null;
       }
@@ -99,9 +105,14 @@ function gameStateReducer(state, action) {
     }
     case "DRAWBOTAGE_SELECTION": {
       newState.currentDrawbotage = action.drawbotage;
+      newState.showDrawbotageSelection = true;
       newState.drawbotageSelector = null;
       newState.respondWithDrawbotage = null;
       newState.drawbotageSelectionTimeRemaining = null;
+      break;
+    }
+    case "HIDE_DRAWBOTAGE_SELECTION": {
+      newState.showDrawbotageSelection = false;
       break;
     }
     case "GUESS_TIMER": {
@@ -111,7 +122,9 @@ function gameStateReducer(state, action) {
     case "END_TURN": {
       newState.turnTimeRemaining = null;
       newState.coveredWord = null;
-      newState.turnResult = action;
+      newState.turnResult = { ...action };
+      newState.turnResult.timeRemaining = action.timeRemaining / 1000;
+      newState.round = action.round;
 
       if (action.currentTeam === "blue") {
         newState.blueScore += action.points;
@@ -124,36 +137,9 @@ function gameStateReducer(state, action) {
       newState.turnResult = null;
       break;
     }
-    case "SEND_MESSAGE": {
-      const prevMessages = [...newState.messages];
-      const messageCount = newState.messageCount + 1;
-      const messages = [];
-      const fromTeam = newState.bluePlayerNames.includes(action.playerName)
-        ? "blue"
-        : "red";
-
-      for (let message of prevMessages) {
-        const messageCopy = {};
-        messages.push(Object.assign(messageCopy, message));
-      }
-
-      messages.push({
-        sender: action.playerName,
-        text: action.text,
-        id: messageCount,
-      });
-
-      connection.emit("guess", {
-        guess: action.text,
-        playerName: action.playerName,
-        fromTeam,
-        timeRemaining: newState.turnTimeRemaining,
-      });
-      break;
-    }
     case "RECEIVE_MESSAGE": {
       const prevMessages = [...newState.messages];
-      const messageCount = newState.messageCount + 1;
+      newState.messageCount++;
       const messages = [];
 
       for (let message of prevMessages) {
@@ -164,8 +150,12 @@ function gameStateReducer(state, action) {
       messages.push({
         sender: action.message.playerName,
         text: action.message.guess,
-        id: messageCount,
+        isCorrect: action.isCorrect,
+        id: newState.messageCount,
       });
+
+      newState.messages = messages;
+
       break;
     }
     case "END_GAME": {

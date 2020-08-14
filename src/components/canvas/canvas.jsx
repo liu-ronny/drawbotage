@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import paper from "paper/dist/paper-core";
+import connection from "../../api/connection";
 import CanvasManager from "./paper/canvasManager";
 import Toolbar from "./toolbar";
 import Selection from "../game/screens/selection/selection";
@@ -59,6 +60,7 @@ class Canvas extends Component {
     this.resizeCanvas();
     window.addEventListener("resize", this.resizeCanvas);
     this.setState({ activeTool: this.canvasManager.activeTool });
+    connection.attachCanvas(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -94,12 +96,11 @@ class Canvas extends Component {
       canvasContainerElement.clientWidth * this.heightToWidthRatio + "px";
     canvasElement.style.width = "100%";
     canvasElement.style.height = "100%";
+    this.canvasManager.resizeView(canvasContainerElement.clientWidth);
     paper.view.viewSize = new paper.Size(
       canvasElement.clientWidth,
       canvasElement.clientHeight
     );
-    // this.canvasManager.resizeRaster();
-    this.canvasManager.resizeView(canvasContainerElement.clientWidth);
     paper.view.update();
   };
 
@@ -155,6 +156,7 @@ class Canvas extends Component {
               onColorOptionClick={(strokeColor) => {
                 this.canvasManager.strokeColor = strokeColor;
                 this.setState({ strokeColor });
+                connection.emit("setColor", { strokeColor });
               }}
               onSmallSizeClick={() => {
                 this.canvasManager.strokeWidth = this.smallStrokeWidth;
@@ -181,11 +183,12 @@ class Canvas extends Component {
               }}
               onClearClick={() => {
                 this.canvasManager.clearTool.clear();
-                this.setState({ activeTool: this.canvasManager.activeTool });
               }}
               onFillClick={() => {
                 this.canvasManager.fillTool.fill();
-                this.setState({ activeTool: this.canvasManager.activeTool });
+              }}
+              onReverseClick={() => {
+                this.canvasManager.hideTool.activate();
               }}
             />
           )}

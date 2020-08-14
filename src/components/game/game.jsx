@@ -7,7 +7,9 @@ import Chat from "./chat/chat";
 import TurnDisplay from "./turnDisplay/turnDisplay";
 import ScoreUpdate from "./screens/scoreUpdate/scoreUpdate";
 import DrawbotageModal from "./screens/drawbotageChoices/drawbotageModal";
+import DrawbotageSelected from "./screens/drawbotageChoices/drawbotageSelected";
 import GameOver from "./screens/gameOver/gameOver";
+import StartScreen from "./screens/loadingScreen/startScreen";
 import "./game.css";
 
 class Game extends Component {
@@ -33,17 +35,32 @@ class Game extends Component {
 
     return (
       <>
+        {this.props.game.gameStarting ? <StartScreen /> : null}
+
         {this.props.game.endResult ? (
-          <GameOver endResult={this.props.game.endResult} />
+          <GameOver
+            endResult={this.props.game.endResult}
+            dispatch={this.props.dispatch}
+          />
         ) : null}
 
         {this.props.game.turnResult ? (
-          <ScoreUpdate turnResult={this.props.game.turnResult} />
+          <ScoreUpdate
+            turnResult={this.props.game.turnResult}
+            dispatch={this.props.dispatch}
+          />
         ) : null}
 
         {this.props.game.selectDrawbotage ? (
           <DrawbotageModal
             timeRemaining={this.props.game.drawbotageSelectionTimeRemaining}
+            dispatch={this.props.dispatch}
+          />
+        ) : null}
+
+        {this.props.game.showDrawbotageSelection ? (
+          <DrawbotageSelected
+            currentDrawbotage={this.props.game.currentDrawbotage}
             dispatch={this.props.dispatch}
           />
         ) : null}
@@ -86,6 +103,7 @@ class Game extends Component {
                     <div className="col-4 col-lg-3 mh-100">
                       <Chat
                         game={this.props.game}
+                        dispatch={this.props.dispatch}
                         messages={this.props.game.messages}
                         disabled={
                           this.props.game.playerName ===

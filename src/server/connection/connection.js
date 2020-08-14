@@ -145,15 +145,53 @@ class Connection {
 
       socket.on("guess", (data) => {
         if (!this.rooms.has(data.roomId)) {
+          this.emitError(
+            data.roomId,
+            "An error occured on the server. Please try again."
+          );
           return;
         }
 
         const room = this.rooms.get(data.roomId);
+        let isCorrect = false;
         if (room.checkGuess) {
-          room.checkGuess(data);
+          isCorrect = room.checkGuess(data);
         }
 
-        socket.to(data.roomId).emit("message", { message: data });
+        // socket.to(data.roomId).emit("message", { message: data, isCorrect });
+        this.emit("message", data.roomId, { message: data, isCorrect });
+      });
+
+      socket.on("setColor", (data) => {
+        socket.to(socket.roomId).emit("setColor", data);
+      });
+
+      socket.on("drawingTool", (data) => {
+        socket.to(socket.roomId).emit("drawingTool", data);
+      });
+
+      socket.on("eraserTool", (data) => {
+        socket.to(socket.roomId).emit("eraserTool", data);
+      });
+
+      socket.on("clearTool", (data) => {
+        socket.to(socket.roomId).emit("clearTool", data);
+      });
+
+      socket.on("fillTool", (data) => {
+        socket.to(socket.roomId).emit("fillTool", data);
+      });
+
+      socket.on("reverseTool", (data) => {
+        socket.to(socket.roomId).emit("reverseTool", data);
+      });
+
+      socket.on("colorTool", (data) => {
+        socket.to(socket.roomId).emit("colorTool", data);
+      });
+
+      socket.on("hideTool", (data) => {
+        socket.to(socket.roomId).emit("hideTool", data);
       });
     });
   }
@@ -242,6 +280,10 @@ class Connection {
    * @param {function} callback - The function to run if a correct guess has been identified
    */
   enableGuesses(roomId, check, callback) {
+    if (!this.rooms.has(roomId)) {
+      return;
+    }
+
     const room = this.rooms.get(roomId);
 
     room.checkGuess = (data) => {
@@ -250,7 +292,10 @@ class Connection {
       const isCorrect = check(guess, fromTeam);
       if (isCorrect) {
         callback(playerName, timeRemaining);
+        return true;
       }
+
+      return false;
     };
   }
 
@@ -258,6 +303,10 @@ class Connection {
    * Closes up guesses so that guess events don't do anything.
    */
   disableGuesses(roomId) {
+    if (!this.rooms.has(roomId)) {
+      return;
+    }
+
     const room = this.rooms.get(roomId);
     room.checkGuess = null;
   }

@@ -1,32 +1,10 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import "./drawbotageModal.css";
 import DrawbotageCards from "./drawbotageCards";
+import { titles, drawbotages } from "../../../../api/drawbotage";
+import "./drawbotageModal.css";
 
 function DrawbotageChoices(props) {
-  const titles = ["reverse", "hide", "color", "bulldoze"];
-  const drawbotages = {
-    reverse: {
-      description:
-        "Every stroke made by the player appears in the opposite direction.",
-      iconClassName: "fa fa-map-signs",
-    },
-    hide: {
-      description:
-        "The player only sees the previous stroke on his/her canvas.",
-      iconClassName: "far fa-eye-slash",
-    },
-    color: {
-      description: "Each new stroke is set to a random color.",
-      iconClassName: "fa fas fa-palette",
-    },
-    bulldoze: {
-      description:
-        "Every 10 seconds, 1/5th of the canvas gets bulldozed by a moving eraser.",
-      iconClassName: "fa fas fa-eraser",
-    },
-  };
-
   const [pos, setPos] = useState(0);
   const handleLeftArrowClick = () => {
     const prev = pos - 1 < 0 ? titles.length - 1 : pos - 1;

@@ -1,4 +1,5 @@
 import Tool from "../tool";
+import connection from "../../../../api/connection";
 
 /**
  * A tool that draws reversed paths in the specified PaperScope.
@@ -15,7 +16,25 @@ class ReverseTool extends Tool {
     super(paper, canvasManager);
     this.prevPoint = null;
 
+    this._preserveFunctions(["_draw", "_addPoint", "_recordPath"]);
     this._enableBoundsCheckingFor(["_draw", "_addPoint"]);
+
+    for (let name of ["_draw", "_recordPath"]) {
+      this["_emit_" + name] = (handler) => {
+        return (event) => {
+          handler(event);
+
+          connection.emit("reverseTool", {
+            functionName: name,
+            relativePoint: this.canvasManager.getRelativePoint(event.point),
+            relativeStrokeWidth: this.canvasManager.getRelativeStrokeWidth(),
+          });
+        };
+      };
+    }
+  }
+
+  _bindHandlers() {
     this.tool.onMouseDown = this._draw;
     this.tool.onMouseDrag = this._addPoint;
     this.tool.onMouseUp = this._recordPath;
@@ -55,9 +74,7 @@ class ReverseTool extends Tool {
    * @param {ToolEvent} event - The ToolEvent provided by Paper JS
    */
   _addPoint = (event) => {
-    const step = event.delta;
-    const rotated = step.rotate(180);
-    const reversed = this.prevPoint.add(rotated);
+    const reversed = this._getReversedPoint(event);
 
     // disallow any points that are out of bounds to be added to the path
     if (this._isOutOfBounds(reversed)) {
@@ -66,6 +83,29 @@ class ReverseTool extends Tool {
 
     this.prevPoint = reversed;
     this.path.add(reversed);
+  };
+
+  _emit__addPoint = (handler) => {
+    return (event) => {
+      const reversed = this._getReversedPoint(event);
+
+      handler(event);
+
+      connection.emit("reverseTool", {
+        functionName: "addPoint",
+        relativePoint: this.canvasManager.getRelativePoint(reversed),
+      });
+    };
+  };
+
+  _getReversedPoint = (event) => {
+    const step = event.delta;
+    const rotated = step.rotate(180);
+    return this.prevPoint.add(rotated);
+  };
+
+  addPoint = (event) => {
+    this.path.add(event.point);
   };
 
   /**

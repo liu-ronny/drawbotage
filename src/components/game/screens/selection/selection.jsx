@@ -10,7 +10,7 @@ function Selection(props) {
       flexColumn={true}
       marginTop="2"
     >
-      <p role="alert" aria-label="Waiting for word selection">
+      <p role="alert" aria-label="Waiting for selection">
         Waiting for{" "}
         <span className="game-loading-screen-message--highlight">
           {props.selector}

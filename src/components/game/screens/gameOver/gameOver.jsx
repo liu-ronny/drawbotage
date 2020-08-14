@@ -11,7 +11,7 @@ function GameOver(props) {
     });
   };
 
-  const winner = props.endResult.winner === "red" ? "Team 1" : "Team 2";
+  const winner = props.endResult.winner === "blue" ? "Team 1" : "Team 2";
 
   return (
     <Modal
@@ -30,16 +30,24 @@ function GameOver(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="semi-bold mb-4">
+        <p className="semi-bold mb-4" role="status" aria-label="Game result">
           <span className="game-drawbotage-modal-team-name">{winner}</span> won!
         </p>
-        <p className="game-drawbotage-modal-team1-color">
-          Team 1 earned {props.endResult.redScore} points while spending{" "}
-          {props.endResult.redTotalDrawTime} seconds drawing.
-        </p>
-        <p className="game-drawbotage-modal-team2-color">
-          Team 2 earned {props.endResult.blueScore} points while spending{" "}
+        <p
+          className="game-drawbotage-modal-team1-color"
+          role="status"
+          aria-label="Team 1 result"
+        >
+          Team 1 earned {props.endResult.blueScore} points while spending{" "}
           {props.endResult.blueTotalDrawTime} seconds drawing.
+        </p>
+        <p
+          className="game-drawbotage-modal-team2-color"
+          role="status"
+          aria-label="Team 2 result"
+        >
+          Team 2 earned {props.endResult.redScore} points while spending{" "}
+          {props.endResult.redTotalDrawTime} seconds drawing.
         </p>
       </Modal.Body>
       <Modal.Footer>

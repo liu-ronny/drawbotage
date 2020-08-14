@@ -1,6 +1,6 @@
 const PlayerList = require("./playerList");
 const WordBank = require("./wordBank");
-const { intervalPromise } = require("../../utils/promises");
+const { intervalPromise, waitPromise } = require("../../utils/promises");
 
 /**
  * @typedef {object} TurnResult
@@ -35,7 +35,7 @@ class Game {
     this.room = room;
     this.roomId = roomId;
     this.rounds = rounds;
-    this.drawTime = drawTime;
+    this.drawTime = drawTime * 1000;
 
     // set the initial parameters of the game
     // both teams start with 0 points, and play commences from turn 1 of round 1
@@ -71,6 +71,12 @@ class Game {
    * Plays the game. Turns will be played recursively until all rounds have been played out.
    */
   async play() {
+    if (this.round === 1 && this.turn === 1) {
+      this.connection.emit("gameStarting", this.roomId, {});
+      await waitPromise(5000);
+      this.connection.emit("startGameplay", this.roomId, {});
+    }
+
     this.setNextTeam();
     const [prevTeamScore, currentTeamScore] = this.getScores();
 
@@ -96,10 +102,10 @@ class Game {
 
     // have the player select a word, and start receiving guesses to check against
     this.setCurrentWord(await this.selectWord());
-    const result = await this.receiveGuesses(this.drawTime * 1000);
+    const result = await this.receiveGuesses(this.drawTime);
 
     // send the result of the turn to all clients, then update the turn status
-    this.endTurn(result);
+    await this.endTurn(result);
     this.nextTurn();
 
     if (this.gameOver) {
@@ -160,10 +166,11 @@ class Game {
       currentTeam: this.currentTeam,
       word: this.currentWord,
       points: result.points,
-      prevScore: currentTeamScore,
-      currentScore: currentTeamScore + result.points,
+      prevScore: currentTeamScore - result.points,
+      currentScore: currentTeamScore,
       timeRemaining: result.timeRemaining,
       playerName: result.playerName,
+      round: this.round,
     };
   }
 
@@ -180,7 +187,7 @@ class Game {
    * @throws {EmptyPlayerListError}
    */
   setNextPlayer() {
-    const [currentPlayers] = this.getPlayers();
+    const [_, currentPlayers] = this.getPlayers();
     this.currentPlayer = currentPlayers.next();
   }
 
@@ -196,7 +203,7 @@ class Game {
    * Ends the current turn in the game.
    * @param {TurnResult} result - An object that contains information about the result of the most recent turn
    */
-  endTurn(result) {
+  async endTurn(result) {
     // update the total draw time and score for the current team
     this[this.currentTeam + "TotalDrawTime"] +=
       this.drawTime - result.timeRemaining;
@@ -204,6 +211,8 @@ class Game {
     this[this.currentTeam + "Score"] += result.points;
 
     this.connection.emit("endTurn", this.roomId, this.getInfo(result));
+    await waitPromise(5000);
+    this.connection.emit("hideTurnResult", this.roomId, {});
   }
 
   /**
@@ -248,7 +257,6 @@ class Game {
    * @param {number} points - The number of points the current team gained during the turn
    */
   calculatePoints(drawTimeRemaining) {
-    drawTimeRemaining /= 1000;
     const frac = drawTimeRemaining / this.drawTime;
     let points = 0;
 
@@ -306,7 +314,7 @@ class Game {
     const [response, timerId] = this.getResponse(
       "selectDrawbotage",
       socket,
-      this.drawbotages,
+      { drawbotages: this.drawbotages, timeRemaining: 20000 },
       20000
     );
 
@@ -322,6 +330,8 @@ class Game {
     this.connection.emit("drawbotageSelection", this.roomId, {
       selection: drawbotage,
     });
+    await waitPromise(5000);
+    this.connection.emit("hideDrawbotageSelection", this.roomId, {});
 
     return drawbotage;
   }
@@ -388,14 +398,14 @@ class Game {
    * Creates a check function that validates incoming guesses.
    * @returns {function} - A function that returns True if the guess is the current word, or False if it is incorrect
    */
-  createGuessChecker = () => {
+  createGuessChecker() {
     return (guess, fromTeam) => {
       if (fromTeam === this.currentTeam) {
         return guess.trim().toLowerCase() === this.currentWord;
       }
       return false;
     };
-  };
+  }
 
   /**
    * Allows client sockets to start sending in guesses for the current turn.

@@ -45,12 +45,11 @@ class CanvasManager {
     this.eraserTool = new EraserTool(paper, this, defaults.eraserSizes);
     this.clearTool = new ClearTool(paper, this);
     this.fillTool = new FillTool(paper, this);
-    this.drawbotages = {
-      reverseTool: new ReverseTool(paper, this),
-      hideTool: new HideTool(paper, this),
-      colorTool: new ColorTool(paper, this),
-      bulldozeTool: new BulldozeTool(paper, this),
-    };
+
+    this.reverseTool = new ReverseTool(paper, this);
+    this.hideTool = new HideTool(paper, this);
+    this.colorTool = new ColorTool(paper, this);
+    this.bulldozeTool = new BulldozeTool(paper, this);
 
     // this.drawingTool.activate();
     // this.activeTool = "drawing";
@@ -93,13 +92,83 @@ class CanvasManager {
     }
   };
 
+  /**
+   * Returns a relative point. The coordinates in the point specify the x and y
+   * coordinates in relation to the width and height of the current view.
+   * @param {Point} point
+   * @returns {object}
+   */
+  getRelativePoint = (point) => {
+    return {
+      x: point.x / this.paper.project.view.size.width,
+      y: point.y / this.paper.project.view.size.height,
+    };
+  };
+
+  getRelativeEraserSize = (size) => {
+    return {
+      width: size.width / this.paper.project.view.size.width,
+      height: size.height / this.paper.project.view.size.height,
+    };
+  };
+
+  /**
+   * Returns an absolute point given a relative point.
+   * @param {Point} point
+   * @returns {object}
+   */
+  getAbsolutePoint = (point) => {
+    const viewWidth = this.paper.project.view.size.width;
+    const viewHeight = this.paper.project.view.size.height;
+    return new this.paper.Point(point.x * viewWidth, point.y * viewHeight);
+  };
+
+  getAbsoluteEraserSize = (size) => {
+    const width = size.width * this.paper.project.view.size.width;
+    const height = size.height * this.paper.project.view.size.height;
+    return new this.paper.Size(width, height);
+  };
+
+  /**
+   * Returns a relative stroke width. This is the size of the stroke width in
+   * relation to the width of the current view.
+   */
+  getRelativeStrokeWidth = () => {
+    return this.strokeWidth / this.paper.project.view.size.width;
+  };
+
+  /**
+   * Returns an aboslute stroke width given a relative stroke width.
+   * @param {number} relativeStrokeWidth - The ratio of stroke width to view size
+   */
+  getAbsoluteStrokeWidth = (relativeStrokeWidth) => {
+    return relativeStrokeWidth * this.paper.project.view.size.width;
+  };
+
   activate() {
     this.drawingTool.activate();
-    this.activeTool = "drawing";
+
+    this.drawingTool.enableEmitters();
+    this.eraserTool.enableEmitters();
+    this.clearTool.enableEmitters(false);
+    this.fillTool.enableEmitters(false);
+
+    this.reverseTool.enableEmitters();
+    this.colorTool.enableEmitters();
+    this.hideTool.enableEmitters();
   }
 
   deactivate() {
     this.disabledTool.activate();
+
+    this.drawingTool.disableEmitters();
+    this.eraserTool.disableEmitters();
+    this.clearTool.disableEmitters(false);
+    this.fillTool.disableEmitters(false);
+
+    this.reverseTool.disableEmitters();
+    this.colorTool.disableEmitters();
+    this.hideTool.disableEmitters();
   }
 }
 
