@@ -28,11 +28,13 @@ function DrawbotageSelected(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <DrawbotageCard
-          title={title}
-          description={description}
-          iconClassName={iconClassName}
-        />
+        <div className="d-flex justify-content-center">
+          <DrawbotageCard
+            title={title}
+            description={description}
+            iconClassName={iconClassName}
+          />
+        </div>
       </Modal.Body>
     </Modal>
   );

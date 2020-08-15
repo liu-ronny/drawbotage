@@ -210,7 +210,7 @@ class Room {
     try {
       await this.game.play();
     } catch (err) {
-      console.log(err);
+      this.game.endGame(false);
     }
   }
 }

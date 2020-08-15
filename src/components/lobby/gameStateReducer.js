@@ -91,6 +91,7 @@ function gameStateReducer(state, action) {
     }
     case "DRAWBOTAGE_SELECTED": {
       newState.selectDrawbotage = false;
+      // newState.drawbotage = action.drawbotage;
 
       if (newState.respondWithDrawbotage) {
         newState.respondWithDrawbotage(action.drawbotage);
@@ -104,7 +105,7 @@ function gameStateReducer(state, action) {
       break;
     }
     case "DRAWBOTAGE_SELECTION": {
-      newState.currentDrawbotage = action.drawbotage;
+      newState.currentDrawbotage = action.selection;
       newState.showDrawbotageSelection = true;
       newState.drawbotageSelector = null;
       newState.respondWithDrawbotage = null;
@@ -125,6 +126,7 @@ function gameStateReducer(state, action) {
       newState.turnResult = { ...action };
       newState.turnResult.timeRemaining = action.timeRemaining / 1000;
       newState.round = action.round;
+      newState.drawbotage = null;
 
       if (action.currentTeam === "blue") {
         newState.blueScore += action.points;

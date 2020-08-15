@@ -9,7 +9,7 @@ import ScoreUpdate from "./screens/scoreUpdate/scoreUpdate";
 import DrawbotageModal from "./screens/drawbotageChoices/drawbotageModal";
 import DrawbotageSelected from "./screens/drawbotageChoices/drawbotageSelected";
 import GameOver from "./screens/gameOver/gameOver";
-import StartScreen from "./screens/loadingScreen/startScreen";
+import LoadingScreen from "../general/loadingScreen/loadingScreen";
 import "./game.css";
 
 class Game extends Component {
@@ -35,7 +35,9 @@ class Game extends Component {
 
     return (
       <>
-        {this.props.game.gameStarting ? <StartScreen /> : null}
+        {this.props.game.gameStarting ? (
+          <LoadingScreen text="Starting game..." animation="chase" />
+        ) : null}
 
         {this.props.game.endResult ? (
           <GameOver

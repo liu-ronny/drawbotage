@@ -2,6 +2,7 @@
   cursor: pointer;
   position: relative;
   padding-bottom: 0.25rem;
+  color: #444444;
 }
 
 .home-form-tab--active {

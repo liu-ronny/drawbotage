@@ -107,7 +107,13 @@
 .player-tag {
   cursor: pointer;
   background-color: #e9ecef;
+  color: #444444;
   border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.player-tag:hover {
+  background-color: rgba(72, 190, 219, 0.25);
 }
 
 /* .host-player-tag {

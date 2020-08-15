@@ -6,7 +6,6 @@ function Selection(props) {
     <LoadingScreen
       timeRemaining={props.timeRemaining}
       justify="center"
-      displaySpinner={true}
       flexColumn={true}
       marginTop="2"
     >

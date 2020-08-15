@@ -70,7 +70,7 @@ class ColorTool extends Tool {
    */
   activate = () => {
     this.tool.activate();
-    this.canvasManager.activeTool = "color";
+    this.canvasManager.activeTool = "drawing";
     this.canvasManager.drawLayer.activate();
   };
 }

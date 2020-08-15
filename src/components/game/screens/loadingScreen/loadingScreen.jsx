@@ -1,7 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 import "./loadingScreen.css";
-import "./spinner.css";
 
 function LoadingScreen(props) {
   const className = classNames(
@@ -22,18 +21,6 @@ function LoadingScreen(props) {
     <div className="game-loading-screen-container">
       <div className={className}>
         {props.children}
-        {props.displaySpinner && (
-          <div
-            className="spinner"
-            role="alert"
-            aria-busy="true"
-            aria-label="Waiting..."
-          >
-            <div className="bounce1" />
-            <div className="bounce2" />
-            <div className="bounce3" />
-          </div>
-        )}
         {displayTimer && (
           <div
             className={"mt-" + props.marginTop}

@@ -63,11 +63,28 @@ class Canvas extends Component {
     connection.attachCanvas(this);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const wasCurrentPlayer =
       prevProps.game.playerName === prevProps.game.currentPlayerName;
     const isCurrentPlayer =
       this.props.game.playerName === this.props.game.currentPlayerName;
+    const prevDrawbotage = prevProps.game.currentDrawbotage;
+    const currentDrawbotage = this.props.game.currentDrawbotage;
+
+    if (
+      isCurrentPlayer &&
+      prevState.activeTool !== this.canvasManager.activeTool
+    ) {
+      this.setState({ activeTool: this.canvasManager.activeTool });
+    }
+
+    if (
+      isCurrentPlayer &&
+      currentDrawbotage &&
+      prevDrawbotage !== currentDrawbotage
+    ) {
+      this.canvasManager[currentDrawbotage + "Tool"].activate();
+    }
 
     if (!wasCurrentPlayer && isCurrentPlayer) {
       this.canvasManager.activate();
@@ -105,6 +122,35 @@ class Canvas extends Component {
   };
 
   render() {
+    let handleDrawClick;
+
+    switch (this.props.game.currentDrawbotage) {
+      case "reverse":
+        handleDrawClick = () => {
+          this.canvasManager.reverseTool.activate();
+          this.setState({ activeTool: this.canvasManager.activeTool });
+        };
+        break;
+      case "color":
+        handleDrawClick = () => {
+          this.canvasManager.colorTool.activate();
+          this.setState({ activeTool: this.canvasManager.activeTool });
+        };
+        break;
+      case "hide":
+        handleDrawClick = () => {
+          this.canvasManager.hideTool.activate();
+          this.setState({ activeTool: this.canvasManager.activeTool });
+        };
+        break;
+      default:
+        handleDrawClick = () => {
+          this.canvasManager.drawingTool.activate();
+          this.setState({ activeTool: this.canvasManager.activeTool });
+        };
+        break;
+    }
+
     return (
       <div>
         <div className="canvas" ref={this.paperContainerRef}>
@@ -173,10 +219,7 @@ class Canvas extends Component {
                 this.canvasManager.eraserSize = "large";
                 this.setState({ sizeSelection: "large" });
               }}
-              onDrawClick={() => {
-                this.canvasManager.drawingTool.activate();
-                this.setState({ activeTool: this.canvasManager.activeTool });
-              }}
+              onDrawClick={handleDrawClick}
               onEraserClick={() => {
                 this.canvasManager.eraserTool.activate();
                 this.setState({ activeTool: this.canvasManager.activeTool });
@@ -186,9 +229,6 @@ class Canvas extends Component {
               }}
               onFillClick={() => {
                 this.canvasManager.fillTool.fill();
-              }}
-              onReverseClick={() => {
-                this.canvasManager.hideTool.activate();
               }}
             />
           )}

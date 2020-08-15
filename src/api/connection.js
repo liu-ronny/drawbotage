@@ -117,6 +117,8 @@ class Connection {
     });
 
     this.socket.on("endTurn", (data) => {
+      this.canvas.canvasManager.clearTool.clear();
+
       data.type = "END_TURN";
       dispatch(data);
     });

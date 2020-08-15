@@ -29,9 +29,9 @@ class Tool {
    * @returns {Function} The decorated handler
    */
   _boundsChecker(handler) {
-    return (event) => {
+    return (event, ...args) => {
       if (!event.event || event.event.target.id === "canvas") {
-        handler(event);
+        handler(event, args);
       }
     };
   }

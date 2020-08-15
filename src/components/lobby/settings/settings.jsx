@@ -31,7 +31,7 @@ function Settings(props) {
   return (
     <>
       <div className="lobby-settings-header text-primary">Settings</div>
-      <div className="pt-5">
+      <div className="lobby-settings pt-5">
         <div className="mb-4">
           <Option
             label="Rounds"

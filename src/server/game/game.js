@@ -95,8 +95,9 @@ class Game {
       return;
     }
 
+    // previous gap was 150 - not sure if changing to 100 will break the tests
     // if the other team is behind by a certain amount, let a player from that team choose a drawbotage
-    if (prevTeamScore + 150 <= currentTeamScore) {
+    if (prevTeamScore + 100 <= currentTeamScore) {
       await this.selectDrawbotage();
     }
 
@@ -300,13 +301,13 @@ class Game {
    * @returns {string} The name of the selected drawbotage
    */
   async selectDrawbotage() {
-    const [prevPlayers] = this.getPlayers();
+    const [prevPlayers, _] = this.getPlayers();
     const selector = prevPlayers.peek();
     const socket = this.room.playerSocket(selector);
 
     socket.to(this.roomId).broadcast.emit("waitForDrawbotageSelection", {
       selector,
-      timeRemaining: 20000,
+      timeRemaining: 120000,
     });
 
     // give the player 10 seconds to select a drawbotage before selecting one at random
@@ -314,8 +315,8 @@ class Game {
     const [response, timerId] = this.getResponse(
       "selectDrawbotage",
       socket,
-      { drawbotages: this.drawbotages, timeRemaining: 20000 },
-      20000
+      { drawbotages: this.drawbotages, timeRemaining: 120000 },
+      120000
     );
 
     try {

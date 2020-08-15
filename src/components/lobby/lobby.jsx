@@ -6,7 +6,6 @@ import Teams from "./teams/teams";
 import Game from "../game/game";
 import gameStateReducer from "./gameStateReducer";
 import connection from "../../api/connection";
-
 import "./lobby.css";
 
 const initialGameState = {

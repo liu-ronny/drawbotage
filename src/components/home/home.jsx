@@ -3,6 +3,7 @@ import { Redirect, useLocation, Link } from "react-router-dom";
 import Header from "../general/header/header";
 import Alert from "../general/alert/alert";
 import Form from "./form/form";
+import LoadingScreen from "../general/loadingScreen/loadingScreen";
 import createRoomId from "../../api/createRoomId";
 import "./home.css";
 
@@ -14,6 +15,7 @@ function Home(props) {
     joinRoom: false,
     createRoom: false,
   });
+  const [loading, setLoading] = useState(false);
   const [createRoomError, setCreateRoomError] = useState(false);
   const location = useLocation();
   const fromWindowUnload = location.state && location.state.fromWindowUnload;
@@ -21,6 +23,8 @@ function Home(props) {
   function handleJoin(values) {
     const { roomId, name } = values;
     setCreateRoomError(false);
+    setLoading(true);
+    setTimeout(() => setLoading(false), 2000);
     setStatus({
       playerName: name,
       roomId,
@@ -34,8 +38,11 @@ function Home(props) {
     const { name, roomName } = values;
 
     try {
+      setLoading(true);
+
       var roomId = await createRoomId();
 
+      setTimeout(() => setLoading(false), 2000);
       setCreateRoomError(false);
       setStatus({
         playerName: name,
@@ -68,6 +75,10 @@ function Home(props) {
       window.history.replaceState(null, "");
     }
   }, []);
+
+  if (loading) {
+    return <LoadingScreen animation="spinner" />;
+  }
 
   if (status.joinRoom || status.createRoom) {
     return (

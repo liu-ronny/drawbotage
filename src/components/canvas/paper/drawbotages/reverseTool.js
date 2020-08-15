@@ -115,7 +115,7 @@ class ReverseTool extends Tool {
    */
   activate = () => {
     this.tool.activate();
-    this.canvasManager.activeTool = "reverse";
+    this.canvasManager.activeTool = "drawing";
     this.canvasManager.drawLayer.activate();
   };
 }

@@ -116,7 +116,7 @@ class BulldozeTool extends Tool {
    * @override
    */
   activate = () => {
-    this.canvasManager.activeTool = "bulldoze";
+    this.canvasManager.activeTool = "drawing";
     this._bulldoze();
   };
 }

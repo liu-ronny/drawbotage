@@ -84,7 +84,7 @@ class HideTool extends Tool {
    */
   activate = () => {
     this.tool.activate();
-    this.canvasManager.activeTool = "hide";
+    this.canvasManager.activeTool = "drawing";
     this.canvasManager.drawLayer.activate();
   };
 }

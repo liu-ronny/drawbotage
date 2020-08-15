@@ -29,7 +29,14 @@ class FillTool extends Tool {
     rect.fillColor = this.canvasManager.strokeColor;
     rect.addTo(this.canvasManager.eraseLayer);
 
-    this.canvasManager.eraserTool.rasterizeAfterErase(undefined, false);
+    const eraserToolOriginalFns = this.canvasManager.eraserTool
+      ._originalFunctions;
+    if (eraserToolOriginalFns && eraserToolOriginalFns.rasterizeAfterErase) {
+      eraserToolOriginalFns.rasterizeAfterErase({}, false);
+    } else {
+      this.canvasManager.eraserTool.rasterizeAfterErase({}, false);
+    }
+
     rect.remove();
     this.paper.view.update();
   };
