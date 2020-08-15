@@ -9,7 +9,9 @@ async function createRoomId() {
   try {
     const response = await timeoutPromise(
       5000,
-      fetch("/rooms", { method: "POST" })
+      fetch("https://shrouded-woodland-63031.herokuapp.com/rooms", {
+        method: "POST",
+      })
     );
     const roomId = await response.text();
     return roomId;

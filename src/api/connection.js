@@ -10,7 +10,7 @@ class Connection {
   }
 
   open() {
-    this.socket = io("http://localhost:8080");
+    this.socket = io("https://shrouded-woodland-63031.herokuapp.com/");
   }
 
   close() {

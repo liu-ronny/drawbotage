@@ -1,6 +1,6 @@
 export default async function validatePlayerName(roomId, playerName) {
   const response = await fetch(
-    `http://localhost:8080/rooms/${roomId}/players/${playerName}`
+    `https://shrouded-woodland-63031.herokuapp.com/rooms/${roomId}/players/${playerName}`
   );
   const text = await response.text();
   return text === "false";
