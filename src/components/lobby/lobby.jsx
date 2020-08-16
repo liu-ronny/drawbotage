@@ -21,11 +21,11 @@ const initialGameState = {
   messageCount: 0,
   start: false,
   rounds: 3,
-  drawTime: 60,
+  drawTime: 30,
   round: 1,
 };
 const roundOptions = [3, 5, 7];
-const drawTimeOptions = [60, 80, 100];
+const drawTimeOptions = [30, 45, 60, 100, 120];
 
 function Lobby(props) {
   const { playerName, roomId, joinRoom, createRoom } = props;
