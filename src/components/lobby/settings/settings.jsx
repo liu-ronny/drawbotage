@@ -17,7 +17,7 @@ function Settings(props) {
     onLeave,
   } = props;
   const [urlCopied, setUrlCopied] = useState(false);
-  const url = "http://localhost:3000/" + props.roomId;
+  const url = "https://drawbotage.herokuapp.com/" + props.roomId;
 
   function handleCopy() {
     navigator.clipboard.writeText(url).then(() => {
