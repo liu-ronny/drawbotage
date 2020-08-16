@@ -18,7 +18,11 @@
   font-family: "Montserrat", sans-serif;
 }
 
-.chat-conversation {
+/* .chat-conversation {
+  overflow-y: scroll;
+} */
+
+.chat-conversation-box {
   overflow-y: scroll;
 }
 
